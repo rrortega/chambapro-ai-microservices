@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    environment:
+      - AI_EMBEDDINGS_PROVIDER=local
+      - AI_EMBEDDINGS_LOCAL_URL=http://embeddings:8080/v1/embeddings
+      - AI_TRANSLATION_PROVIDER=local
+      - AI_TRANSLATION_LOCAL_URL=http://translator:8000/v1/translations
+      - REDIS_URL=redis://redis:6379
+      - INTERNAL_AI_API_KEY=secreto_interno
+    depends_on:
+      - redis
+      - embeddings
+      - translator
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+
+  embeddings:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-latest
+    command:
+      - --model-id
+      - intfloat/multilingual-e5-small
+      - --port
+      - "8080"
+      - --served-model-name
+      - multilingual-e5-small
+    volumes:
+      - embedding-models:/data
+    environment:
+      HF_HOME: /data
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  translator:
+    build:
+      context: ./docker/ai/translator
+    environment:
+      TRANSLATION_MODEL: facebook/m2m100_418M
+      DEVICE: cpu
+      COMPUTE_TYPE: int8
+    volumes:
+      - translation-models:/models
+    ports:
+      - "127.0.0.1:8090:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+volumes:
+  embedding-models:
+  translation-models:
+  redis-data:

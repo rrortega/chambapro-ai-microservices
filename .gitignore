@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+data/
+translation-models/
+embedding-models/
+
+# Antigravity/Agent/IDE specific
+.agent/
+.agents/
+.gemini/
+prompts/
+skills/

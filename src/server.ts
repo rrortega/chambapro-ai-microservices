@@ -1,0 +1,32 @@
+import Fastify from 'fastify';
+import cors from '@fastify/cors';
+import { embeddingsRoutes } from './routes/embeddings';
+import { translationRoutes } from './routes/translations';
+import { cacheRoutes } from './routes/cache';
+
+const fastify = Fastify({
+  logger: true
+});
+
+fastify.register(cors, {
+  origin: '*'
+});
+
+fastify.register(embeddingsRoutes);
+fastify.register(translationRoutes);
+fastify.register(cacheRoutes);
+
+fastify.get('/health', async () => {
+  return { status: 'ok' };
+});
+
+const start = async () => {
+  try {
+    await fastify.listen({ port: 3000, host: '0.0.0.0' });
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
+
+start();
