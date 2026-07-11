@@ -6,11 +6,13 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
+    execstack \
     && rm -rf /var/lib/apt/lists/*
 
 # Install python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && \
+    execstack -c /usr/local/lib/python3.11/site-packages/ctranslate2/libctranslate2*.so* || true
 
 # Copy source code
 COPY main.py .
