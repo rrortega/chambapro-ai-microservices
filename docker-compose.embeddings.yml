@@ -17,10 +17,14 @@ services:
       - "64"
       - --max-batch-tokens
       - "2048"
+      - --tokenization-workers
+      - "2"
     volumes:
       - ${EMBEDDINGS_HOST_DIR:-embedding-models}:/data
     environment:
       HF_HOME: /data
+      OMP_NUM_THREADS: "2"
+      RAYON_NUM_THREADS: "2"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://127.0.0.1:80/health || exit 1"]
