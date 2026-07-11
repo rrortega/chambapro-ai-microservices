@@ -1,17 +1,25 @@
+import { initTelemetry } from './telemetry';
+// Inicializar telemetría ANTES de iniciar el resto de la app
+initTelemetry();
+
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { embeddingsRoutes } from './routes/embeddings';
 import { translationRoutes } from './routes/translations';
 import { cacheRoutes } from './routes/cache';
+import { authPlugin } from './plugins/auth';
+import { swaggerPlugin } from './plugins/swagger';
 
 const fastify = Fastify({
   logger: true
 });
 
-fastify.register(cors, {
-  origin: '*'
-});
+// Plugins globales
+fastify.register(cors, { origin: '*' });
+fastify.register(swaggerPlugin);
+fastify.register(authPlugin);
 
+// Rutas
 fastify.register(embeddingsRoutes);
 fastify.register(translationRoutes);
 fastify.register(cacheRoutes);

@@ -1,8 +1,24 @@
 import { FastifyInstance } from 'fastify';
 import { translateText } from '../services/translation';
+import { tokenCounter } from '../telemetry';
 
 export async function translationRoutes(fastify: FastifyInstance) {
-  fastify.post('/v1/translations', async (request, reply) => {
+  fastify.post('/v1/translations', {
+    schema: {
+      tags: ['Translations'],
+      summary: 'EN: Translate text | ES: Traducir texto',
+      description: 'EN: Translates text from source to target language. | ES: Traduce texto desde idioma origen al destino.',
+      body: {
+        type: 'object',
+        required: ['input', 'source_language', 'target_language'],
+        properties: {
+          input: { type: ['string', 'array'], items: { type: 'string' } },
+          source_language: { type: 'string', example: 'en' },
+          target_language: { type: 'string', example: 'es' }
+        }
+      }
+    }
+  }, async (request, reply) => {
     const body = request.body as any;
     
     if (!body || !body.input || !body.source_language || !body.target_language) {
@@ -12,14 +28,20 @@ export async function translationRoutes(fastify: FastifyInstance) {
     try {
       const inputs = Array.isArray(body.input) ? body.input : [body.input];
       const data = [];
+      let totalChars = 0;
       
       for (let i = 0; i < inputs.length; i++) {
-        const text = await translateText(inputs[i], body.source_language, body.target_language);
+        const textToTranslate = inputs[i];
+        totalChars += textToTranslate.length;
+        const text = await translateText(textToTranslate, body.source_language, body.target_language);
         data.push({
           text,
           index: i,
         });
       }
+
+      // Add to telemetry
+      tokenCounter.add(totalChars);
 
       return reply.send({
         data,

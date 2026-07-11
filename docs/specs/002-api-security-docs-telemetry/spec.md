@@ -38,6 +38,8 @@ El microservicio de IA (Gateway) actualmente no cuenta con un estándar de segur
 - `ENABLE_TELEMETRY`: booleano (`true`/`false`).
 - `OTEL_EXPORTER_OTLP_ENDPOINT`: URL del colector de métricas (opcional, por defecto puede ser `http://localhost:4318/v1/metrics`).
 - `OTEL_SERVICE_NAME`: Nombre del servicio para la telemetría (ej. `chambapro-ai-gateway`).
+- `AI_EMBEDDINGS_EXTERNAL_API_KEY` / `AI_EMBEDDINGS_EXTERNAL_MODEL`: Credenciales y modelo para fallback externo (ej. OpenAI, DeepSeek).
+- `AI_TRANSLATION_EXTERNAL_API_KEY` / `AI_TRANSLATION_EXTERNAL_MODEL`: Credenciales y modelo para fallback externo (ej. DeepSeek, OpenAI).
 
 ## 4. Criterios de Aceptación (Acceptance Criteria)
 1. **[AC1]** Peticiones a `/v1/embeddings` o `/v1/translations` sin `x-api-key` válido deben retornar HTTP 401.

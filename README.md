@@ -23,11 +23,40 @@ This project is built using a microservices architecture orchestrated by Docker 
    docker-compose up --build
    ```
 
-## Endpoints
+## API Documentation
+
+Interactive API documentation (Swagger UI) is available out-of-the-box in two languages. Once the gateway is running, visit:
+- **English**: [http://localhost:3000/docs/en](http://localhost:3000/docs/en) (Coming soon, unified at `/docs`)
+- **Interactive Unified UI**: [http://localhost:3000/docs](http://localhost:3000/docs) (Bilingual descriptions EN/ES)
+
+## Security
+
+All business logic endpoints are protected by an API Key. 
+You must include the `x-api-key` header in all requests to `/v1/*`.
+
+```bash
+curl -X POST http://localhost:3000/v1/embeddings \
+  -H "x-api-key: your_global_key_here" \
+  ...
+```
+
+To configure this key, set the `GLOBAL_API_KEY` variable in your `.env` file.
+
+## Observability (Telemetry)
+
+The gateway includes built-in OpenTelemetry (OTEL) support for metrics and tracing. 
+By default, it tracks request rates, latency, system CPU/RAM, and custom AI metrics (token usage, fallback rates).
+
+To enable telemetry:
+1. Set `ENABLE_TELEMETRY=true` in your `.env`.
+2. Configure your metric collector endpoint (default is a local OpenTelemetry Collector at `http://localhost:4318/v1/metrics`) using `OTEL_EXPORTER_OTLP_ENDPOINT`.
+3. Set your service name using `OTEL_SERVICE_NAME` (default: `chambapro-ai-gateway`).
+
+## Endpoints Overview
 
 - `POST /v1/embeddings`: OpenAI-compatible embeddings endpoint.
 - `POST /v1/translations`: Specialized translation endpoint.
-- `DELETE /v1/cache/translations`: Clears translation cache (Requires `INTERNAL_AI_API_KEY`).
+- `DELETE /v1/cache/translations`: Clears translation cache.
 
 ## License
 Proprietary

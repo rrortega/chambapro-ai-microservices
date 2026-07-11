@@ -1,14 +1,21 @@
 import { FastifyInstance } from 'fastify';
 import { redis } from '../services/redis';
-import { AI_CONFIG } from '../config';
 
 export async function cacheRoutes(fastify: FastifyInstance) {
-  fastify.delete('/v1/cache/translations', async (request, reply) => {
-    const authHeader = request.headers.authorization;
-    if (authHeader !== `Bearer ${AI_CONFIG.internalApiKey}`) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+  fastify.delete('/v1/cache/translations', {
+    schema: {
+      tags: ['Cache'],
+      summary: 'EN: Clear translations cache | ES: Limpiar caché de traducciones',
+      description: 'EN: Clears all translations or a specific one by hash. | ES: Limpia toda la caché o una específica por hash.',
+      querystring: {
+        type: 'object',
+        properties: {
+          hash: { type: 'string', description: 'Optional. Specific translation hash to delete.' }
+        }
+      }
     }
-
+  }, async (request, reply) => {
+    // Auth is now handled globally via x-api-key hook
     const query = request.query as any;
     
     try {

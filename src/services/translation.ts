@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import crypto from 'node:crypto';
 import { AI_CONFIG } from '../config';
 import { redis } from './redis';
+import { fallbackCounter } from '../telemetry';
 
 function getTranslationHash(text: string, src: string, target: string): string {
   return crypto.createHash('sha256').update(`${src}:${target}:${text}`).digest('hex');
@@ -45,6 +46,7 @@ export async function translateText(text: string, sourceLanguage: string, target
       result = data.data?.[0]?.text || '';
     } catch (err) {
       console.warn('[AI Gateway] Local translation failed, trying external fallback...', err);
+      fallbackCounter.add(1);
       result = await fetchExternalTranslation(cleanText, sourceLanguage, targetLanguage);
     }
   } else {
@@ -69,11 +71,11 @@ export async function translateText(text: string, sourceLanguage: string, target
 async function fetchExternalTranslation(text: string, src: string, target: string): Promise<string> {
   const client = new OpenAI({
     baseURL: AI_CONFIG.translation.externalUrl.replace('/v1/chat/completions', '/v1'),
-    apiKey: process.env.OPENAI_API_KEY || '',
+    apiKey: AI_CONFIG.translation.externalApiKey,
   });
 
   const response = await client.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: AI_CONFIG.translation.externalModel,
     messages: [
       { role: 'system', content: `You are a professional translator. Translate from ${src} to ${target}. Output ONLY the translated text, without quotes or extra formatting.` },
       { role: 'user', content: text },
