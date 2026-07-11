@@ -11,7 +11,13 @@ import { authPlugin } from './plugins/auth';
 import { swaggerPlugin } from './plugins/swagger';
 
 const fastify = Fastify({
-  logger: true
+  logger: true,
+  ajv: {
+    customOptions: {
+      strict: false,
+      allowUnionTypes: true
+    }
+  }
 });
 
 // Plugins globales
