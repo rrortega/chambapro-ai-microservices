@@ -133,7 +133,7 @@ La plataforma está diseñada para ser desplegada por completo a través de Dock
 
 ### 1. Easypanel (Recomendado)
 
-[Easypanel](https://easypanel.io/) es un panel de control moderno para administrar apps de Docker. Como este repositorio contiene múltiples servicios interdependientes (Gateway, TEI, Traductor Python, Redis), debes usar el tipo de despliegue Docker Compose de Easypanel.
+[Easypanel](https://easypanel.io/) es un panel de control moderno para administrar apps de Docker. Como este repositorio contiene múltiples servicios interdependientes (Gateway, TEI, Traductor Python), debes usar el tipo de despliegue Docker Compose de Easypanel.
 
 **Paso a paso para Easypanel:**
 1. En tu panel de Easypanel, navega a tu Proyecto.
@@ -141,7 +141,7 @@ La plataforma está diseñada para ser desplegada por completo a través de Dock
 3. Conecta tu repositorio de Github o pega el contenido de `docker-compose.yml` directamente en el editor de Compose de Easypanel.
 4. Ve a la pestaña **Environment** y llena tus variables (ej. `GLOBAL_API_KEY`, `OPENAI_API_KEY`, etc).
 5. Ve a la pestaña **Domains** y enlaza tu dominio público (ej., `ai.chambapro.com`) al servicio **gateway** en el puerto **3000**.
-   - **NO** expongas los servicios `embeddings`, `translator`, ni `redis` al internet. Deben permanecer internos.
+   - **NO** expongas los servicios `embeddings` ni `translator` al internet. Deben permanecer internos.
 6. Haz clic en **Deploy**. Easypanel proveerá automáticamente certificados SSL y orquestará todo el clúster.
 
 ### 2. Docker Directo (VPS / EC2 / Droplet)
@@ -163,7 +163,7 @@ Si estás administrando tu propio servidor con Docker instalado:
 1. En tu panel de Coolify, crea un nuevo **Project** y **Environment**.
 2. Añade un nuevo **Resource** -> **Docker Compose**.
 3. Conecta tu repositorio de Git.
-4. Coolify leerá el archivo compose y detectará los servicios `gateway`, `translator`, `embeddings` y `redis`.
+4. Coolify leerá el archivo compose y detectará los servicios `gateway`, `translator` y `embeddings`.
 5. En la configuración del servicio **gateway**:
    - Añade tus variables de entorno.
    - Configura los dominios/URL que quieres exponer. Coolify maneja el enrutamiento de Traefik/Caddy automáticamente.

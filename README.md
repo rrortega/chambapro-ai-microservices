@@ -133,7 +133,7 @@ The platform is designed to be deployed entirely via Docker Compose. Below are g
 
 ### 1. Easypanel (Recommended)
 
-[Easypanel](https://easypanel.io/) is a modern control panel for managing Docker apps. Since this repository contains multiple inter-dependent services (Gateway, TEI, Python Translator, Redis), you must use Easypanel's Docker Compose deployment type.
+[Easypanel](https://easypanel.io/) is a modern control panel for managing Docker apps. Since this repository contains multiple inter-dependent services (Gateway, TEI, Python Translator), you must use Easypanel's Docker Compose deployment type.
 
 **Step-by-step for Easypanel:**
 1. In your Easypanel dashboard, navigate to your Project.
@@ -141,7 +141,7 @@ The platform is designed to be deployed entirely via Docker Compose. Below are g
 3. Connect your Github repository or paste the contents of `docker-compose.yml` directly into the Compose editor.
 4. Go to the **Environment** tab and populate your variables (e.g., `GLOBAL_API_KEY`, `OPENAI_API_KEY`).
 5. Go to the **Domains** tab and map your public domain (e.g., `ai.chambapro.com`) to the **gateway** service on port **3000**.
-   - Do **NOT** expose the `embeddings`, `translator`, or `redis` services to the internet. They must remain internal.
+   - Do **NOT** expose the `embeddings` or `translator` services to the internet. They must remain internal.
 6. Click **Deploy**. Easypanel will orchestrate the cluster and provision SSL automatically.
 
 ### 2. Direct Docker (VPS / EC2 / Droplet)
@@ -163,7 +163,7 @@ If you are managing your own server with Docker installed:
 1. In your Coolify dashboard, create a new **Project** and **Environment**.
 2. Add a new **Resource** -> **Docker Compose**.
 3. Connect your Git repository.
-4. Coolify will parse the compose file and detect the `gateway`, `translator`, `embeddings`, and `redis` services.
+4. Coolify will parse the compose file and detect the `gateway`, `translator`, and `embeddings` services.
 5. In the configuration for the **gateway** service:
    - Add your environment variables.
    - Configure the domains/URL you want to expose. Coolify handles Traefik/Caddy routing automatically.
