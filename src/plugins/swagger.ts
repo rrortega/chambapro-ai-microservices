@@ -42,4 +42,25 @@ export const swaggerPlugin = fp(async (fastify: FastifyInstance) => {
   fastify.get('/docs', async (request, reply) => {
     return reply.redirect('/');
   });
+
+  // Endpoints to serve the READMEs
+  fastify.get('/docs/readme', (request, reply) => {
+    try {
+      const mdPath = path.join(__dirname, '../../README.md');
+      const content = fs.readFileSync(mdPath, 'utf8');
+      reply.type('text/plain').send(content);
+    } catch (e) {
+      reply.code(404).send('README.md not found');
+    }
+  });
+
+  fastify.get('/docs/readme.es', (request, reply) => {
+    try {
+      const mdPath = path.join(__dirname, '../../README.es.md');
+      const content = fs.readFileSync(mdPath, 'utf8');
+      reply.type('text/plain').send(content);
+    } catch (e) {
+      reply.code(404).send('README.es.md not found');
+    }
+  });
 });

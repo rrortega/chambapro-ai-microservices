@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ChambaPro AI - API Reference</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <style>
@@ -46,8 +47,10 @@
           <span class="hidden sm:inline">ChambaPro AI</span>
           <span class="sm:hidden">API</span>
         </h1>
-        <p class="hidden md:block text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider font-semibold lang-en hidden">API Reference</p>
-        <p class="hidden md:block text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider font-semibold lang-es">Referencia API</p>
+        <p class="hidden md:block text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider font-semibold">
+          <span class="lang-en hidden">API Reference</span>
+          <span class="lang-es">Referencia API</span>
+        </p>
       </div>
 
       <!-- Mobile Toggles -->
@@ -77,13 +80,21 @@
     </div>
 
     <nav class="flex px-4 pb-4 md:pb-0 md:flex-col gap-2 space-y-0 md:space-y-1 overflow-x-auto md:overflow-visible">
-      <button onclick="switchTab('translations')" id="tab-translations" class="whitespace-nowrap w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg bg-brand/10 text-brand transition-colors text-left">
+      <button onclick="switchTab('home')" id="tab-home" class="whitespace-nowrap w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg bg-brand/10 text-brand transition-colors text-left">
         <span class="w-2 h-2 rounded-full bg-brand"></span>
+        <span class="lang-en hidden">Home</span><span class="lang-es">Inicio</span>
+      </button>
+      <button onclick="switchTab('translations')" id="tab-translations" class="whitespace-nowrap w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
+        <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600"></span>
         <span class="lang-en hidden">Translations</span><span class="lang-es">Traducciones</span>
       </button>
       <button onclick="switchTab('embeddings')" id="tab-embeddings" class="whitespace-nowrap w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
         <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600"></span>
         Embeddings
+      </button>
+      <button onclick="switchTab('agents')" id="tab-agents" class="whitespace-nowrap w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
+        <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+        <span class="lang-en hidden">AI Agents</span><span class="lang-es">Agentes AI</span>
       </button>
     </nav>
   </aside>
@@ -92,10 +103,17 @@
   <main class="flex-1 flex flex-col lg:flex-row h-full overflow-y-auto lg:overflow-hidden bg-white dark:bg-slate-900 transition-colors duration-200">
     
     <!-- Documentation & Forms (Center) -->
-    <div class="w-full lg:flex-1 lg:overflow-y-auto p-4 md:p-8 lg:p-12 relative flex-shrink-0">
+    <div class="flex-1 p-6 lg:p-12 overflow-y-auto w-full max-w-5xl">
       
-      <!-- Translations Section -->
-      <div id="sec-translations" class="max-w-2xl mx-auto space-y-8">
+      <!-- Home Section -->
+      <div id="sec-home" class="max-w-4xl mx-auto space-y-8">
+        <div id="readme-content" class="prose prose-slate dark:prose-invert max-w-none">
+          <!-- Markdown injected here -->
+        </div>
+      </div>
+      
+      <!-- Translations Section (Hidden by default) -->
+      <div id="sec-translations" class="max-w-2xl mx-auto space-y-8 hidden">
         <div>
           <div class="flex items-center gap-3 mb-2">
             <span class="px-2 py-1 text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded uppercase">POST</span>
@@ -221,6 +239,68 @@
           </form>
         </div>
       </div>
+
+      <!-- AI Agents Prompt Section -->
+      <div id="sec-agents" class="max-w-3xl mx-auto space-y-8 hidden">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight mb-2">
+            <span class="lang-en hidden">AI Agents Integration</span>
+            <span class="lang-es">Integración para Agentes AI</span>
+          </h2>
+          <p class="text-slate-500 dark:text-slate-400">
+            <span class="lang-en hidden">System prompts and configuration to connect coding agents (Cursor, OpenCode, Codex, etc.) to this microservice.</span>
+            <span class="lang-es">Instrucciones y prompts para conectar agentes de programación (Cursor, OpenCode, Codex, etc.) a este microservicio.</span>
+          </p>
+        </div>
+
+        <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
+          <h3 class="text-lg font-semibold mb-4">
+            <span class="lang-en hidden">System Prompt for AI Agents</span>
+            <span class="lang-es">System Prompt para Agentes</span>
+          </h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">
+            <span class="lang-en hidden">Copy and paste this prompt into your AI agent's instructions (e.g., Cursor Rules, `.cursorrules`, or custom agent prompts).</span>
+            <span class="lang-es">Copia y pega este prompt en las instrucciones de tu agente (ej. `.cursorrules` o configuraciones de agentes).</span>
+          </p>
+          
+          <div class="relative group">
+            <pre class="bg-slate-900 text-slate-300 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre-wrap"><code class="language-markdown"># AI Inference Gateway Configuration
+
+You have access to the ChambaPro AI Inference Gateway. Whenever you need to perform language translation or generate text embeddings, DO NOT use external APIs directly. Instead, you MUST use the internal microservice endpoints below.
+
+## 1. Translations Endpoint
+- **URL**: `http://localhost:3000/v1/translations`
+- **Method**: `POST`
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-api-key: <YOUR_GLOBAL_API_KEY>`
+- **Body Schema**:
+  ```json
+  {
+    "input": ["Text to translate"],
+    "source_language": "en",
+    "target_language": "es"
+  }
+  ```
+
+## 2. Embeddings Endpoint
+- **URL**: `http://localhost:3000/v1/embeddings`
+- **Method**: `POST`
+- **Headers**:
+  - `Content-Type: application/json`
+  - `x-api-key: <YOUR_GLOBAL_API_KEY>`
+- **Body Schema**:
+  ```json
+  {
+    "input": ["Text to embed"],
+    "model": "multilingual-e5-small"
+  }
+  ```
+
+Note: Replace `<YOUR_GLOBAL_API_KEY>` with the actual key provided in the environment variables (usually `GLOBAL_API_KEY`).</code></pre>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Code & Response Panel (Right Sidebar - Always Dark) -->
@@ -264,15 +344,32 @@
     // Toggle Language
     window.toggleLang = function() {
       try {
-        currentLang = currentLang === 'es' ? 'en' : 'es';
         if (currentLang === 'es') {
-          document.querySelectorAll('.lang-es').forEach(el => el.classList.remove('hidden'));
-          document.querySelectorAll('.lang-en').forEach(el => el.classList.add('hidden'));
-        } else {
-          document.querySelectorAll('.lang-en').forEach(el => el.classList.remove('hidden'));
+          currentLang = 'en';
           document.querySelectorAll('.lang-es').forEach(el => el.classList.add('hidden'));
+          document.querySelectorAll('.lang-en').forEach(el => el.classList.remove('hidden'));
+        } else {
+          currentLang = 'es';
+          document.querySelectorAll('.lang-en').forEach(el => el.classList.add('hidden'));
+          document.querySelectorAll('.lang-es').forEach(el => el.classList.remove('hidden'));
         }
+        loadReadme();
       } catch(e) { console.error('Error toggling language:', e); }
+    }
+
+    window.loadReadme = async function() {
+      try {
+        const endpoint = currentLang === 'es' ? '/docs/readme.es' : '/docs/readme';
+        const res = await fetch(endpoint);
+        if (res.ok) {
+          const text = await res.text();
+          document.getElementById('readme-content').innerHTML = marked.parse(text);
+          // Highlight code blocks in readme
+          document.querySelectorAll('#readme-content pre code').forEach((block) => {
+            if (window.hljs) hljs.highlightElement(block);
+          });
+        }
+      } catch(e) { console.error('Error loading readme:', e); }
     }
 
     // Toggle Theme
@@ -291,29 +388,33 @@
       } catch(e) { console.error('Error toggling theme:', e); }
     }
 
-    // Tab switching logic
+    // Tab Switching
     window.switchTab = function(tabId) {
-      try {
-        document.getElementById('sec-translations').classList.add('hidden');
-        document.getElementById('sec-embeddings').classList.add('hidden');
-        
-        const tabT = document.getElementById('tab-translations');
-        const tabE = document.getElementById('tab-embeddings');
-        
-        tabT.className = "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left";
-        tabT.firstElementChild.className = "w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600";
-        
-        tabE.className = "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left";
-        tabE.firstElementChild.className = "w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600";
-
-        document.getElementById('sec-' + tabId).classList.remove('hidden');
-        
-        const activeTab = document.getElementById('tab-' + tabId);
-        activeTab.className = "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg bg-brand/10 text-brand transition-colors text-left";
-        activeTab.firstElementChild.className = "w-2 h-2 rounded-full bg-brand";
-        
+      document.querySelectorAll('[id^="sec-"]').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('[id^="tab-"]').forEach(el => {
+        el.classList.remove('bg-brand/10', 'text-brand');
+        el.classList.add('text-slate-600', 'dark:text-slate-400');
+        el.querySelector('span').classList.replace('bg-brand', 'bg-slate-300');
+        el.querySelector('span').classList.replace('dark:bg-brand', 'dark:bg-slate-600');
+      });
+      
+      document.getElementById('sec-' + tabId).classList.remove('hidden');
+      const activeTab = document.getElementById('tab-' + tabId);
+      activeTab.classList.remove('text-slate-600', 'dark:text-slate-400');
+      activeTab.classList.add('bg-brand/10', 'text-brand');
+      activeTab.querySelector('span').classList.replace('bg-slate-300', 'bg-brand');
+      
+      if (tabId === 'home') {
+        const reqCode = document.getElementById('req-code');
+        reqCode.textContent = "// This is the project's documentation.";
+        if (window.hljs) hljs.highlightElement(reqCode);
+      } else if (tabId === 'agents') {
+        const reqCode = document.getElementById('req-code');
+        reqCode.textContent = "// No dynamic payload for this section.\n// Copy the markdown prompt on the left.";
+        if (window.hljs) hljs.highlightElement(reqCode);
+      } else {
         updateRequestPreview(tabId);
-      } catch(e) { console.error('Error switching tabs:', e); }
+      }
     }
 
     window.updateRequestPreview = function(tabId) {
@@ -402,6 +503,34 @@
       executeApiCall('/v1/translations', apiKey, body);
     }
 
+    window.clearTranslationsCache = async function() {
+      const apiKey = document.getElementById('t-apikey').value;
+      const statusBadge = document.getElementById('res-status');
+      const resCode = document.getElementById('res-code');
+      
+      try {
+        const res = await fetch('/v1/cache/translations', {
+          method: 'DELETE',
+          headers: {
+            'x-api-key': apiKey
+          }
+        });
+        const data = await res.json();
+        
+        statusBadge.classList.remove('hidden', 'bg-red-500/20', 'text-red-400');
+        statusBadge.classList.add('bg-green-500/20', 'text-green-400');
+        statusBadge.textContent = res.status + ' Cache Cleared';
+        resCode.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        statusBadge.classList.remove('hidden', 'bg-green-500/20', 'text-green-400');
+        statusBadge.classList.add('bg-red-500/20', 'text-red-400');
+        statusBadge.textContent = "Error";
+        resCode.textContent = err.message;
+      } finally {
+        if (window.hljs) hljs.highlightElement(resCode);
+      }
+    }
+
     window.executeEmbeddings = function(e) {
       e.preventDefault();
       const apiKey = document.getElementById('e-apikey').value;
@@ -417,7 +546,8 @@
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       try {
-        updateRequestPreview('translations');
+        switchTab('home');
+        loadReadme();
         
         // Load saved API Key if any
         const savedKey = localStorage.getItem('chambapro_apikey');
