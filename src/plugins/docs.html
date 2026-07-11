@@ -249,77 +249,87 @@
     let currentLang = 'es';
 
     // Toggle Language
-    function toggleLang() {
-      currentLang = currentLang === 'es' ? 'en' : 'es';
-      if (currentLang === 'es') {
-        document.querySelectorAll('.lang-es').forEach(el => el.classList.remove('hidden'));
-        document.querySelectorAll('.lang-en').forEach(el => el.classList.add('hidden'));
-      } else {
-        document.querySelectorAll('.lang-en').forEach(el => el.classList.remove('hidden'));
-        document.querySelectorAll('.lang-es').forEach(el => el.classList.add('hidden'));
-      }
+    window.toggleLang = function() {
+      try {
+        currentLang = currentLang === 'es' ? 'en' : 'es';
+        if (currentLang === 'es') {
+          document.querySelectorAll('.lang-es').forEach(el => el.classList.remove('hidden'));
+          document.querySelectorAll('.lang-en').forEach(el => el.classList.add('hidden'));
+        } else {
+          document.querySelectorAll('.lang-en').forEach(el => el.classList.remove('hidden'));
+          document.querySelectorAll('.lang-es').forEach(el => el.classList.add('hidden'));
+        }
+      } catch(e) { console.error('Error toggling language:', e); }
     }
 
     // Toggle Theme
-    function toggleTheme() {
-      const html = document.documentElement;
-      if (html.classList.contains('dark')) {
-        html.classList.remove('dark');
-        document.getElementById('theme-sun').classList.add('hidden');
-        document.getElementById('theme-moon').classList.remove('hidden');
-      } else {
-        html.classList.add('dark');
-        document.getElementById('theme-moon').classList.add('hidden');
-        document.getElementById('theme-sun').classList.remove('hidden');
-      }
+    window.toggleTheme = function() {
+      try {
+        const html = document.documentElement;
+        if (html.classList.contains('dark')) {
+          html.classList.remove('dark');
+          document.getElementById('theme-sun').classList.add('hidden');
+          document.getElementById('theme-moon').classList.remove('hidden');
+        } else {
+          html.classList.add('dark');
+          document.getElementById('theme-moon').classList.add('hidden');
+          document.getElementById('theme-sun').classList.remove('hidden');
+        }
+      } catch(e) { console.error('Error toggling theme:', e); }
     }
 
     // Tab switching logic
-    function switchTab(tabId) {
-      document.getElementById('sec-translations').classList.add('hidden');
-      document.getElementById('sec-embeddings').classList.add('hidden');
-      
-      const tabT = document.getElementById('tab-translations');
-      const tabE = document.getElementById('tab-embeddings');
-      
-      tabT.className = "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left";
-      tabT.firstElementChild.className = "w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600";
-      
-      tabE.className = "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left";
-      tabE.firstElementChild.className = "w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600";
+    window.switchTab = function(tabId) {
+      try {
+        document.getElementById('sec-translations').classList.add('hidden');
+        document.getElementById('sec-embeddings').classList.add('hidden');
+        
+        const tabT = document.getElementById('tab-translations');
+        const tabE = document.getElementById('tab-embeddings');
+        
+        tabT.className = "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left";
+        tabT.firstElementChild.className = "w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600";
+        
+        tabE.className = "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left";
+        tabE.firstElementChild.className = "w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600";
 
-      document.getElementById('sec-' + tabId).classList.remove('hidden');
-      
-      const activeTab = document.getElementById('tab-' + tabId);
-      activeTab.className = "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg bg-brand/10 text-brand transition-colors text-left";
-      activeTab.firstElementChild.className = "w-2 h-2 rounded-full bg-brand";
-      
-      updateRequestPreview(tabId);
+        document.getElementById('sec-' + tabId).classList.remove('hidden');
+        
+        const activeTab = document.getElementById('tab-' + tabId);
+        activeTab.className = "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg bg-brand/10 text-brand transition-colors text-left";
+        activeTab.firstElementChild.className = "w-2 h-2 rounded-full bg-brand";
+        
+        updateRequestPreview(tabId);
+      } catch(e) { console.error('Error switching tabs:', e); }
     }
 
-    function updateRequestPreview(tabId) {
-      let reqBody = {};
-      if (tabId === 'translations') {
-        const inputs = document.getElementById('t-input').value.split('\\n').filter(s => s.trim());
-        reqBody = {
-          input: inputs,
-          source_language: document.getElementById('t-source').value || 'en',
-          target_language: document.getElementById('t-target').value || 'es',
-          beam_size: parseInt(document.getElementById('t-beam').value) || 1,
-          repetition_penalty: parseFloat(document.getElementById('t-rep').value) || 1.0
-        };
-      } else {
-        const inputs = document.getElementById('e-input').value.split('\\n').filter(s => s.trim());
-        reqBody = {
-          model: 'multilingual-e5-small',
-          input: inputs,
-          encoding_format: document.getElementById('e-encoding').value,
-          truncate: document.getElementById('e-truncate').checked
-        };
-      }
-      const reqCode = document.getElementById('req-code');
-      reqCode.textContent = JSON.stringify(reqBody, null, 2);
-      hljs.highlightElement(reqCode);
+    window.updateRequestPreview = function(tabId) {
+      try {
+        let reqBody = {};
+        if (tabId === 'translations') {
+          const rawInput = document.getElementById('t-input').value;
+          const inputs = rawInput.split('\n').filter(s => s.trim());
+          reqBody = {
+            input: inputs,
+            source_language: document.getElementById('t-source').value || 'en',
+            target_language: document.getElementById('t-target').value || 'es',
+            beam_size: parseInt(document.getElementById('t-beam').value) || 1,
+            repetition_penalty: parseFloat(document.getElementById('t-rep').value) || 1.0
+          };
+        } else {
+          const rawInput = document.getElementById('e-input').value;
+          const inputs = rawInput.split('\n').filter(s => s.trim());
+          reqBody = {
+            model: 'multilingual-e5-small',
+            input: inputs,
+            encoding_format: document.getElementById('e-encoding').value,
+            truncate: document.getElementById('e-truncate').checked
+          };
+        }
+        const reqCode = document.getElementById('req-code');
+        reqCode.textContent = JSON.stringify(reqBody, null, 2);
+        if (window.hljs) hljs.highlightElement(reqCode);
+      } catch(e) { console.error('Error updating preview:', e); }
     }
 
     // Attach real-time updates to inputs
@@ -330,7 +340,7 @@
       });
     });
 
-    async function executeApiCall(url, apiKey, body) {
+    window.executeApiCall = async function(url, apiKey, body) {
       document.getElementById('loader').classList.remove('hidden');
       const resCode = document.getElementById('res-code');
       const statusBadge = document.getElementById('res-status');
@@ -362,15 +372,15 @@
         statusBadge.textContent = "Error";
         resCode.textContent = err.message;
       } finally {
-        hljs.highlightElement(resCode);
+        if (window.hljs) hljs.highlightElement(resCode);
         document.getElementById('loader').classList.add('hidden');
       }
     }
 
-    function executeTranslations(e) {
+    window.executeTranslations = function(e) {
       e.preventDefault();
       const apiKey = document.getElementById('t-apikey').value;
-      const inputs = document.getElementById('t-input').value.split('\\n').filter(s => s.trim());
+      const inputs = document.getElementById('t-input').value.split('\n').filter(s => s.trim());
       const body = {
         input: inputs,
         source_language: document.getElementById('t-source').value,
@@ -381,10 +391,10 @@
       executeApiCall('/v1/translations', apiKey, body);
     }
 
-    function executeEmbeddings(e) {
+    window.executeEmbeddings = function(e) {
       e.preventDefault();
       const apiKey = document.getElementById('e-apikey').value;
-      const inputs = document.getElementById('e-input').value.split('\\n').filter(s => s.trim());
+      const inputs = document.getElementById('e-input').value.split('\n').filter(s => s.trim());
       const body = {
         input: inputs,
         encoding_format: document.getElementById('e-encoding').value,
@@ -395,18 +405,22 @@
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-      updateRequestPreview('translations');
-      
-      // Load saved API Key if any
-      const savedKey = localStorage.getItem('chambapro_apikey');
-      if (savedKey) {
-        document.getElementById('t-apikey').value = savedKey;
-        document.getElementById('e-apikey').value = savedKey;
-      }
+      try {
+        updateRequestPreview('translations');
+        
+        // Load saved API Key if any
+        const savedKey = localStorage.getItem('chambapro_apikey');
+        if (savedKey) {
+          document.getElementById('t-apikey').value = savedKey;
+          document.getElementById('e-apikey').value = savedKey;
+        }
 
-      // Save API key on input
-      document.getElementById('t-apikey').addEventListener('change', (e) => localStorage.setItem('chambapro_apikey', e.target.value));
-      document.getElementById('e-apikey').addEventListener('change', (e) => localStorage.setItem('chambapro_apikey', e.target.value));
+        // Save API key on input
+        document.getElementById('t-apikey').addEventListener('change', (e) => localStorage.setItem('chambapro_apikey', e.target.value));
+        document.getElementById('e-apikey').addEventListener('change', (e) => localStorage.setItem('chambapro_apikey', e.target.value));
+      } catch (e) {
+        console.error('Initialization error:', e);
+      }
     });
   </script>
 </body>
