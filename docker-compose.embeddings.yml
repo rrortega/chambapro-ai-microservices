@@ -9,6 +9,16 @@ services:
       - "80"
       - --served-model-name
       - multilingual-e5-small
+      - --max-batch-requests
+      - "8"
+      - --max-client-batch-size
+      - "8"
+      - --max-concurrent-requests
+      - "64"
+      - --max-batch-tokens
+      - "2048"
+    ports:
+      - "3000:80"
     volumes:
       - ${EMBEDDINGS_HOST_DIR:-embedding-models}:/data
     environment:
