@@ -1,7 +1,7 @@
 fastapi==0.110.0
 uvicorn==0.27.1
 ctranslate2==4.8.1
-transformers==4.38.2
+transformers
 pydantic==2.6.4
 sentencepiece
 --extra-index-url https://download.pytorch.org/whl/cpu
