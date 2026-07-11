@@ -22,7 +22,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 3G
 
 volumes:
   embedding-models:
