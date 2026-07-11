@@ -36,22 +36,24 @@ export async function translationRoutes(fastify: FastifyInstance) {
       let promptTokens = 0;
       let completionTokens = 0;
       
+      let usedModel = '';
       for (let i = 0; i < inputs.length; i++) {
         const textToTranslate = inputs[i];
         totalChars += textToTranslate.length;
         promptTokens += Math.ceil(textToTranslate.length / 4);
         
-        const text = await translateText(textToTranslate, body.source_language, body.target_language, {
+        const result = await translateText(textToTranslate, body.source_language, body.target_language, {
           beam_size: body.beam_size,
           max_batch_size: body.max_batch_size,
           num_hypotheses: body.num_hypotheses,
           repetition_penalty: body.repetition_penalty
         });
         
-        completionTokens += Math.ceil(text.length / 4);
+        completionTokens += Math.ceil(result.text.length / 4);
+        usedModel = result.model; // all will generally use the same model
         
         data.push({
-          text,
+          text: result.text,
           index: i,
         });
       }
@@ -61,6 +63,7 @@ export async function translationRoutes(fastify: FastifyInstance) {
 
       return reply.send({
         object: 'translation.list',
+        model: usedModel,
         data,
         usage: {
           prompt_tokens: promptTokens,

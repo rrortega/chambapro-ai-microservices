@@ -8,9 +8,9 @@ function getTranslationHash(text: string, src: string, target: string): string {
   return crypto.createHash('sha256').update(`${src}:${target}:${text}`).digest('hex');
 }
 
-export async function translateText(text: string, sourceLanguage: string, targetLanguage: string, options: any = {}): Promise<string> {
+export async function translateText(text: string, sourceLanguage: string, targetLanguage: string, options: any = {}): Promise<{text: string, model: string}> {
   const cleanText = (text || '').trim();
-  if (!cleanText) return '';
+  if (!cleanText) return { text: '', model: 'none' };
 
   const optionsHash = crypto.createHash('md5').update(JSON.stringify(options)).digest('hex');
   const cacheKey = `translation:${sourceLanguage}:${targetLanguage}:${optionsHash}:${getTranslationHash(cleanText, sourceLanguage, targetLanguage)}`;
@@ -18,13 +18,19 @@ export async function translateText(text: string, sourceLanguage: string, target
   try {
     const cached = await redis.get(cacheKey);
     if (cached) {
-      return cached;
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed.text) return parsed;
+      } catch (e) {
+        return { text: cached, model: 'cached-unknown' };
+      }
     }
   } catch (err) {
     console.warn('[AI Gateway] Translation cache read error:', err);
   }
 
   let result = '';
+  let usedModel = '';
 
   if (AI_CONFIG.translation.provider === 'local') {
     try {
@@ -46,31 +52,37 @@ export async function translateText(text: string, sourceLanguage: string, target
 
       const data = await response.json() as any;
       result = data.data?.[0]?.text || '';
+      usedModel = data.model || 'local-translator';
     } catch (err) {
       console.warn('[AI Gateway] Local translation failed, trying external fallback...', err);
       fallbackCounter.add(1);
-      result = await fetchExternalTranslation(cleanText, sourceLanguage, targetLanguage);
+      const extRes = await fetchExternalTranslation(cleanText, sourceLanguage, targetLanguage);
+      result = extRes.text;
+      usedModel = extRes.model;
     }
   } else {
-    result = await fetchExternalTranslation(cleanText, sourceLanguage, targetLanguage);
+    const extRes = await fetchExternalTranslation(cleanText, sourceLanguage, targetLanguage);
+    result = extRes.text;
+    usedModel = extRes.model;
   }
 
   if (result) {
     try {
+      const cacheVal = JSON.stringify({ text: result, model: usedModel });
       if (AI_CONFIG.translation.cacheTtl === -1) {
-        await redis.set(cacheKey, result);
+        await redis.set(cacheKey, cacheVal);
       } else {
-        await redis.set(cacheKey, result, 'EX', AI_CONFIG.translation.cacheTtl);
+        await redis.set(cacheKey, cacheVal, 'EX', AI_CONFIG.translation.cacheTtl);
       }
     } catch (err) {
       console.warn('[AI Gateway] Translation cache write error:', err);
     }
   }
 
-  return result;
+  return { text: result, model: usedModel };
 }
 
-async function fetchExternalTranslation(text: string, src: string, target: string): Promise<string> {
+async function fetchExternalTranslation(text: string, src: string, target: string): Promise<{text: string, model: string}> {
   const client = new OpenAI({
     baseURL: AI_CONFIG.translation.externalUrl.replace('/v1/chat/completions', '/v1'),
     apiKey: AI_CONFIG.translation.externalApiKey,
@@ -85,5 +97,8 @@ async function fetchExternalTranslation(text: string, src: string, target: strin
     temperature: 0.1,
   });
 
-  return response.choices[0]?.message?.content?.trim() || '';
+  return {
+    text: response.choices[0]?.message?.content?.trim() || '',
+    model: response.model || AI_CONFIG.translation.externalModel
+  };
 }
