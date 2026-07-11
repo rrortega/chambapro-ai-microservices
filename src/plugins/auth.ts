@@ -6,7 +6,7 @@ export const authPlugin = fp(async (fastify: FastifyInstance) => {
   fastify.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
     const url = request.raw.url;
     // Permitir acceso público a documentación y health check
-    if (url?.startsWith('/health') || url?.startsWith('/docs')) {
+    if (url === '/' || url?.startsWith('/health') || url?.startsWith('/docs')) {
       return;
     }
 

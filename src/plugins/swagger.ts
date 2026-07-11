@@ -37,4 +37,9 @@ export const swaggerPlugin = fp(async (fastify: FastifyInstance) => {
     const htmlContent = fs.readFileSync(htmlPath, 'utf8');
     return htmlContent;
   });
+
+  // Redirect legacy /docs route to root
+  fastify.get('/docs', async (request, reply) => {
+    return reply.redirect('/');
+  });
 });
