@@ -17,6 +17,7 @@ export async function translationRoutes(fastify: FastifyInstance) {
           source_language: { type: 'string', example: 'en' },
           target_language: { type: 'string', example: 'es' },
           target: { type: 'string', example: 'es' },
+          ignore_cache: { type: 'boolean', default: false, description: 'Skip cache' },
           beam_size: { type: 'number', default: 1, description: 'Beam size for generation' },
           max_batch_size: { type: 'number', default: 1024, description: 'Max batch size' },
           num_hypotheses: { type: 'number', default: 1, description: 'Number of hypotheses' },
@@ -52,7 +53,8 @@ export async function translationRoutes(fastify: FastifyInstance) {
           beam_size: body.beam_size,
           max_batch_size: body.max_batch_size,
           num_hypotheses: body.num_hypotheses,
-          repetition_penalty: body.repetition_penalty
+          repetition_penalty: body.repetition_penalty,
+          ignore_cache: body.ignore_cache
         });
         
         completionTokens += Math.ceil(result.text.length / 4);
@@ -61,6 +63,8 @@ export async function translationRoutes(fastify: FastifyInstance) {
         data.push({
           text: result.text,
           index: i,
+          source_language: result.source_language,
+          target_language: result.target_language
         });
       }
 
@@ -70,6 +74,8 @@ export async function translationRoutes(fastify: FastifyInstance) {
       return reply.send({
         object: 'translation.list',
         model: usedModel,
+        source_language: data[0]?.source_language || sourceLanguage,
+        target_language: data[0]?.target_language || targetLanguage,
         translation: data[0]?.text || '',
         translatedText: data[0]?.text || '',
         data,

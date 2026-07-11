@@ -8,29 +8,33 @@ function getTranslationHash(text: string, src: string, target: string): string {
   return crypto.createHash('sha256').update(`${src}:${target}:${text}`).digest('hex');
 }
 
-export async function translateText(text: string, sourceLanguage: string, targetLanguage: string, options: any = {}): Promise<{text: string, model: string}> {
+export async function translateText(text: string, sourceLanguage: string, targetLanguage: string, options: any = {}): Promise<{text: string, model: string, source_language: string, target_language: string}> {
   const cleanText = (text || '').trim();
-  if (!cleanText) return { text: '', model: 'none' };
+  if (!cleanText) return { text: '', model: 'none', source_language: sourceLanguage, target_language: targetLanguage };
 
   const optionsHash = crypto.createHash('md5').update(JSON.stringify(options)).digest('hex');
   const cacheKey = `translation:${sourceLanguage}:${targetLanguage}:${optionsHash}:${getTranslationHash(cleanText, sourceLanguage, targetLanguage)}`;
 
-  try {
-    const cached = await redis.get(cacheKey);
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (parsed.text) return parsed;
-      } catch (e) {
-        return { text: cached, model: 'cached-unknown' };
+  if (!options.ignore_cache) {
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed.text) return parsed;
+        } catch (e) {
+          return { text: cached, model: 'cached-unknown', source_language: sourceLanguage, target_language: targetLanguage };
+        }
       }
+    } catch (err) {
+      console.warn('[AI Gateway] Translation cache read error:', err);
     }
-  } catch (err) {
-    console.warn('[AI Gateway] Translation cache read error:', err);
   }
 
   let result = '';
   let usedModel = '';
+  let detectedSrc = sourceLanguage;
+  let detectedTgt = targetLanguage;
 
   if (AI_CONFIG.translation.provider === 'local') {
     try {
@@ -53,22 +57,28 @@ export async function translateText(text: string, sourceLanguage: string, target
       const data = await response.json() as any;
       result = data.translation || data.translatedText || data.data?.[0]?.text || '';
       usedModel = data.model || 'local-translator';
+      detectedSrc = data.source_language || detectedSrc;
+      detectedTgt = data.target_language || detectedTgt;
     } catch (err) {
       console.warn('[AI Gateway] Local translation failed, trying external fallback...', err);
       fallbackCounter.add(1);
       const extRes = await fetchExternalTranslation(cleanText, sourceLanguage, targetLanguage);
       result = extRes.text;
       usedModel = extRes.model;
+      detectedSrc = extRes.source_language;
+      detectedTgt = extRes.target_language;
     }
   } else {
     const extRes = await fetchExternalTranslation(cleanText, sourceLanguage, targetLanguage);
     result = extRes.text;
     usedModel = extRes.model;
+    detectedSrc = extRes.source_language;
+    detectedTgt = extRes.target_language;
   }
 
   if (result) {
     try {
-      const cacheVal = JSON.stringify({ text: result, model: usedModel });
+      const cacheVal = JSON.stringify({ text: result, model: usedModel, source_language: detectedSrc, target_language: detectedTgt });
       if (AI_CONFIG.translation.cacheTtl === -1) {
         await redis.set(cacheKey, cacheVal);
       } else {
@@ -79,10 +89,10 @@ export async function translateText(text: string, sourceLanguage: string, target
     }
   }
 
-  return { text: result, model: usedModel };
+  return { text: result, model: usedModel, source_language: detectedSrc, target_language: detectedTgt };
 }
 
-async function fetchExternalTranslation(text: string, src: string, target: string): Promise<{text: string, model: string}> {
+async function fetchExternalTranslation(text: string, src: string, target: string): Promise<{text: string, model: string, source_language: string, target_language: string}> {
   if (!AI_CONFIG.translation.externalApiKey) {
     throw new Error("Local model is not ready or failed, and OpenAI fallback is not configured (missing API key). Please wait for the local model to finish downloading or set OPENAI_API_KEY.");
   }
@@ -102,6 +112,8 @@ async function fetchExternalTranslation(text: string, src: string, target: strin
 
   return {
     text: response.choices[0]?.message?.content?.trim() || '',
-    model: response.model || AI_CONFIG.translation.externalModel
+    model: response.model || AI_CONFIG.translation.externalModel,
+    source_language: src,
+    target_language: target
   };
 }
