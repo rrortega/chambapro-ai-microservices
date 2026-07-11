@@ -31,7 +31,7 @@ def load_model():
     print("Model loaded successfully.")
 
 class TranslationRequest(BaseModel):
-    model: str
+    model: Optional[str] = None
     input: List[str]
     source_language: str
     target_language: str
