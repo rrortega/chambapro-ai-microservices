@@ -1,11 +1,7 @@
-version: '3.8'
-
 services:
   gateway:
     build:
       context: .
-    ports:
-      - "3000:3000"
     environment:
       - AI_EMBEDDINGS_PROVIDER=local
       - AI_EMBEDDINGS_LOCAL_URL=http://embeddings:8080/v1/embeddings
@@ -20,8 +16,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "127.0.0.1:6379:6379"
     volumes:
       - redis-data:/data
 
@@ -39,8 +33,6 @@ services:
       - embedding-models:/data
     environment:
       HF_HOME: /data
-    ports:
-      - "127.0.0.1:8080:8080"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -61,8 +53,6 @@ services:
       COMPUTE_TYPE: int8
     volumes:
       - translation-models:/models
-    ports:
-      - "127.0.0.1:8090:8000"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
