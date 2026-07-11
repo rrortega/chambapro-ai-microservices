@@ -73,6 +73,8 @@ async def translate(req: TranslationRequest):
     flat_inputs = []
     mapping = []
     for text in req.input:
+        # Normalize literal "\n" strings (e.g. from UI paste) to actual newlines
+        text = text.replace('\\n', '\n')
         lines = text.split('\n')
         mapping.append(len(lines))
         flat_inputs.extend(lines)
