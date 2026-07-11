@@ -4,5 +4,6 @@ ctranslate2==4.8.1
 transformers
 pydantic==2.6.4
 sentencepiece
+langdetect
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch

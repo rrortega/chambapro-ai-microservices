@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import List, Optional
+from langdetect import detect
 
 app = FastAPI(title="AI Inference Gateway - Translator")
 
@@ -34,7 +35,7 @@ class TranslationRequest(BaseModel):
     model: Optional[str] = None
     input: Optional[List[str]] = None
     text: Optional[str] = None
-    source_language: Optional[str] = "en"
+    source_language: Optional[str] = "auto"
     target_language: Optional[str] = None
     target: Optional[str] = None
     beam_size: int = 1
@@ -93,7 +94,7 @@ async def translate(req: TranslationRequest):
 
     inputs = req.input if req.input else ([req.text] if req.text else [])
     tgt_lang = req.target_language or req.target
-    src_lang = req.source_language or "en"
+    src_lang = req.source_language or "auto"
 
     if not inputs or not tgt_lang:
         raise HTTPException(status_code=400, detail="Missing required fields: input/text and target_language/target")
@@ -102,6 +103,18 @@ async def translate(req: TranslationRequest):
     # We split by newline, translate line by line, and reconstruct.
     flat_inputs = []
     mapping = []
+    
+    # Auto-detect language if requested based on the first non-empty input
+    if src_lang == "auto":
+        combined_text = " ".join(inputs).strip()
+        if combined_text:
+            try:
+                src_lang = detect(combined_text)
+            except:
+                src_lang = "en" # Fallback to english if detection fails
+        else:
+            src_lang = "en"
+            
     for text in inputs:
         # Normalize literal "\n" strings (e.g. from UI paste) to actual newlines
         text = text.replace('\\n', '\n')

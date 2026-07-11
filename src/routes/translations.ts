@@ -29,7 +29,7 @@ export async function translationRoutes(fastify: FastifyInstance) {
     
     const input = body.input || body.text;
     const targetLanguage = body.target_language || body.target;
-    const sourceLanguage = body.source_language || 'en';
+    const sourceLanguage = body.source_language || 'auto';
 
     if (!input || !targetLanguage) {
       return reply.code(400).send({ error: 'Missing required fields (input/text, target_language/target)' });
