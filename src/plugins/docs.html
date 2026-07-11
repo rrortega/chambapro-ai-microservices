@@ -35,40 +35,53 @@
     }
   </script>
 </head>
-<body class="flex h-screen overflow-hidden bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans antialiased transition-colors duration-200">
+<body class="flex flex-col md:flex-row h-screen overflow-hidden bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans antialiased transition-colors duration-200">
 
   <!-- Sidebar -->
-  <aside class="w-64 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full overflow-y-auto transition-colors duration-200 z-20 shadow-lg">
-    <div class="p-6">
-      <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-        <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-        ChambaPro AI
-      </h1>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider font-semibold lang-en hidden">API Reference</p>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider font-semibold lang-es">Referencia API</p>
+  <aside class="w-full md:w-64 bg-slate-50 dark:bg-slate-900 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col md:h-full overflow-y-visible md:overflow-y-auto transition-colors duration-200 z-20 shadow-lg flex-shrink-0">
+    <div class="p-4 md:p-6 flex items-center justify-between md:block">
+      <div>
+        <h1 class="text-lg md:text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+          <svg class="w-5 h-5 md:w-6 md:h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          <span class="hidden sm:inline">ChambaPro AI</span>
+          <span class="sm:hidden">API</span>
+        </h1>
+        <p class="hidden md:block text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider font-semibold lang-en hidden">API Reference</p>
+        <p class="hidden md:block text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider font-semibold lang-es">Referencia API</p>
+      </div>
+
+      <!-- Mobile Toggles -->
+      <div class="flex items-center gap-2 md:hidden">
+        <button onclick="toggleLang()" class="text-xs font-semibold px-2 py-1 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+          <span class="lang-en hidden">ES</span>
+          <span class="lang-es">EN</span>
+        </button>
+        <button onclick="toggleTheme()" class="p-1.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-200 dark:bg-slate-800 rounded transition-colors">
+          <svg id="theme-sun-m" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          <svg id="theme-moon-m" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+      </div>
     </div>
 
-    <!-- Toggles -->
-    <div class="px-6 pb-6 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 mb-4">
+    <!-- Desktop Toggles -->
+    <div class="hidden md:flex px-6 pb-6 items-center justify-between border-b border-slate-200 dark:border-slate-800 mb-4">
       <button onclick="toggleLang()" class="text-xs font-semibold px-2 py-1 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
         <span class="lang-en hidden">ES</span>
         <span class="lang-es">EN</span>
       </button>
       
       <button onclick="toggleTheme()" class="p-1.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-200 dark:bg-slate-800 rounded transition-colors">
-        <!-- Sun Icon -->
         <svg id="theme-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-        <!-- Moon Icon -->
         <svg id="theme-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
       </button>
     </div>
 
-    <nav class="flex-1 px-4 space-y-1">
-      <button onclick="switchTab('translations')" id="tab-translations" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg bg-brand/10 text-brand transition-colors text-left">
+    <nav class="flex px-4 pb-4 md:pb-0 md:flex-col gap-2 space-y-0 md:space-y-1 overflow-x-auto md:overflow-visible">
+      <button onclick="switchTab('translations')" id="tab-translations" class="whitespace-nowrap w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg bg-brand/10 text-brand transition-colors text-left">
         <span class="w-2 h-2 rounded-full bg-brand"></span>
         <span class="lang-en hidden">Translations</span><span class="lang-es">Traducciones</span>
       </button>
-      <button onclick="switchTab('embeddings')" id="tab-embeddings" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
+      <button onclick="switchTab('embeddings')" id="tab-embeddings" class="whitespace-nowrap w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors text-left">
         <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600"></span>
         Embeddings
       </button>
@@ -76,10 +89,10 @@
   </aside>
 
   <!-- Main Content Area -->
-  <main class="flex-1 flex flex-col lg:flex-row h-full overflow-hidden bg-white dark:bg-slate-900 transition-colors duration-200">
+  <main class="flex-1 flex flex-col lg:flex-row h-full overflow-y-auto lg:overflow-hidden bg-white dark:bg-slate-900 transition-colors duration-200">
     
     <!-- Documentation & Forms (Center) -->
-    <div class="flex-1 overflow-y-auto p-8 lg:p-12 relative">
+    <div class="w-full lg:flex-1 lg:overflow-y-auto p-4 md:p-8 lg:p-12 relative flex-shrink-0">
       
       <!-- Translations Section -->
       <div id="sec-translations" class="max-w-2xl mx-auto space-y-8">
@@ -211,7 +224,7 @@
     </div>
 
     <!-- Code & Response Panel (Right Sidebar - Always Dark) -->
-    <div class="w-full lg:w-[480px] bg-darker border-l border-slate-800 h-full flex flex-col text-slate-300 dark-pane shadow-2xl relative z-10">
+    <div class="w-full lg:w-[480px] bg-darker border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col text-slate-300 dark-pane shadow-2xl relative z-10 flex-shrink-0 min-h-[500px] lg:min-h-0 lg:h-full">
       <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-dark">
         <h3 class="text-sm font-semibold text-white tracking-wide uppercase">Console</h3>
         <span id="res-status" class="px-2 py-0.5 text-xs rounded-full font-mono hidden"></span>
@@ -268,12 +281,12 @@
         const html = document.documentElement;
         if (html.classList.contains('dark')) {
           html.classList.remove('dark');
-          document.getElementById('theme-sun').classList.add('hidden');
-          document.getElementById('theme-moon').classList.remove('hidden');
+          document.querySelectorAll('#theme-sun, #theme-sun-m').forEach(el => el.classList.add('hidden'));
+          document.querySelectorAll('#theme-moon, #theme-moon-m').forEach(el => el.classList.remove('hidden'));
         } else {
           html.classList.add('dark');
-          document.getElementById('theme-moon').classList.add('hidden');
-          document.getElementById('theme-sun').classList.remove('hidden');
+          document.querySelectorAll('#theme-moon, #theme-moon-m').forEach(el => el.classList.add('hidden'));
+          document.querySelectorAll('#theme-sun, #theme-sun-m').forEach(el => el.classList.remove('hidden'));
         }
       } catch(e) { console.error('Error toggling theme:', e); }
     }
