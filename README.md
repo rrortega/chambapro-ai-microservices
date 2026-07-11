@@ -135,19 +135,26 @@ The platform is designed to be deployed via Docker Compose. You can deploy every
 
 We have split the infrastructure into multiple `docker-compose` files to allow independent scaling of services:
 
-- **`docker-compose.yml` (All-in-one)**: Deploys Gateway, Embeddings, and Translator together. Ideal for small or initial environments.
+- **`docker-compose.full.yml` (All-in-one)**: Deploys Gateway, Embeddings, and Translator together. Ideal for small or initial environments.
 - **`docker-compose.gateway.yml`**: Deploys ONLY the Gateway service. Scale this if you have many concurrent requests but low AI usage.
 - **`docker-compose.embeddings.yml`**: Deploys ONLY the embeddings engine. Scale this for massive vectorization tasks.
 - **`docker-compose.translator.yml`**: Deploys ONLY the translation engine. Scale this if you process many languages simultaneously.
 
-Below are guides for the most common deployment strategies.### 1. Easypanel (Recommended)
+Below are guides for the most common deployment strategies.
+
+### 🔌 Connect to an external network (PaaS / Easypanel)
+
+If you deploy this microservice in a separate stack and need it to talk to your main Redis or database, you can configure the network using environment variables in any of the compose files:
+
+- `USE_EXTERNAL_NETWORK=true`
+- `EXTERNAL_NETWORK=your_external_network_name` (e.g., `chambapro`)### 1. Easypanel (Recommended)
 
 [Easypanel](https://easypanel.io/) is a modern control panel for managing Docker apps. Since this repository contains multiple inter-dependent services (Gateway, TEI, Python Translator), you must use Easypanel's Docker Compose deployment type.
 
 **Step-by-step for Easypanel:**
 1. In your Easypanel dashboard, navigate to your Project.
 2. Click **Create Service** and select **Docker Compose** (Do NOT select "App").
-3. Connect your Github repository or paste the contents of `docker-compose.yml` directly into the Compose editor.
+3. Connect your Github repository or paste the contents of `docker-compose.full.yml` (or the one you choose) directly into the Compose editor.
 4. Go to the **Environment** tab and populate your variables (e.g., `GLOBAL_API_KEY`, `OPENAI_API_KEY`).
 5. Go to the **Domains** tab and map your public domain (e.g., `ai.chambapro.com`) to the **gateway** service on port **3000**.
    - Do **NOT** expose the `embeddings` or `translator` services to the internet. They must remain internal.
@@ -161,7 +168,7 @@ If you are managing your own server with Docker installed:
 2. Create and populate your production `.env` file based on `.env.example`.
 3. Start the production cluster:
    ```bash
-   docker-compose -f docker-compose.yml up --build -d
+   docker-compose -f docker-compose.full.yml up --build -d
    ```
 4. Set up a reverse proxy (like Nginx or Traefik) to map a domain to port `3000` and handle SSL termination.
 

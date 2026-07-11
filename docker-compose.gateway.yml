@@ -14,3 +14,8 @@ services:
       resources:
         limits:
           memory: 1G
+
+networks:
+  default:
+    name: ${EXTERNAL_NETWORK:-chambapro_ai_default}
+    external: ${USE_EXTERNAL_NETWORK:-false}

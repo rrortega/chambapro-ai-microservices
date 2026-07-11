@@ -135,19 +135,26 @@ La plataforma está diseñada para ser desplegada a través de Docker Compose. P
 
 Hemos dividido la infraestructura en varios archivos `docker-compose` para permitir escalar los servicios de forma independiente:
 
-- **`docker-compose.yml` (Todo en uno)**: Despliega el Gateway, Embeddings y Translator juntos. Ideal para entornos pequeños o iniciales.
+- **`docker-compose.full.yml` (Todo en uno)**: Despliega el Gateway, Embeddings y Translator juntos. Ideal para entornos pequeños o iniciales.
 - **`docker-compose.gateway.yml`**: Despliega SOLO el servicio Gateway. Escálalo si tienes muchas peticiones concurrentes pero poco uso de IA.
 - **`docker-compose.embeddings.yml`**: Despliega SOLO el motor de embeddings. Escálalo para procesos masivos de vectorización.
 - **`docker-compose.translator.yml`**: Despliega SOLO el motor de traducción. Escálalo si procesas muchos idiomas simultáneamente.
 
-A continuación se presentan las guías para las estrategias de despliegue más comunes.### 1. Easypanel (Recomendado)
+A continuación se presentan las guías para las estrategias de despliegue más comunes.
+
+### 🔌 Conectar a una red externa (PaaS / Easypanel)
+
+Si despliegas este microservicio en un stack separado y necesitas que hable con tu Redis o base de datos principal, puedes configurar la red usando variables de entorno en cualquiera de los archivos compose:
+
+- `USE_EXTERNAL_NETWORK=true`
+- `EXTERNAL_NETWORK=nombre_de_tu_red_externa` (ej. `chambapro`)### 1. Easypanel (Recomendado)
 
 [Easypanel](https://easypanel.io/) es un panel de control moderno para administrar apps de Docker. Como este repositorio contiene múltiples servicios interdependientes (Gateway, TEI, Traductor Python), debes usar el tipo de despliegue Docker Compose de Easypanel.
 
 **Paso a paso para Easypanel:**
 1. En tu panel de Easypanel, navega a tu Proyecto.
 2. Haz clic en **Create Service** y selecciona la opción **Docker Compose** (NO selecciones "App").
-3. Conecta tu repositorio de Github o pega el contenido de `docker-compose.yml` directamente en el editor de Compose de Easypanel.
+3. Conecta tu repositorio de Github o pega el contenido de `docker-compose.full.yml` (o el que decidas usar) directamente en el editor de Compose de Easypanel.
 4. Ve a la pestaña **Environment** y llena tus variables (ej. `GLOBAL_API_KEY`, `OPENAI_API_KEY`, etc).
 5. Ve a la pestaña **Domains** y enlaza tu dominio público (ej., `ai.chambapro.com`) al servicio **gateway** en el puerto **3000**.
    - **NO** expongas los servicios `embeddings` ni `translator` al internet. Deben permanecer internos.
@@ -161,7 +168,7 @@ Si estás administrando tu propio servidor con Docker instalado:
 2. Crea y llena tu archivo `.env` de producción basándote en `.env.example`.
 3. Inicia el clúster de producción:
    ```bash
-   docker-compose -f docker-compose.yml up --build -d
+   docker-compose -f docker-compose.full.yml up --build -d
    ```
 4. Configura un proxy inverso (como Nginx o Traefik) para enlazar un dominio al puerto `3000` y manejar la terminación SSL.
 

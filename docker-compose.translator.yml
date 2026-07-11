@@ -21,3 +21,8 @@ services:
 
 volumes:
   translation-models:
+
+networks:
+  default:
+    name: ${EXTERNAL_NETWORK:-chambapro_ai_default}
+    external: ${USE_EXTERNAL_NETWORK:-false}

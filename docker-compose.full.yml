@@ -7,11 +7,18 @@ services:
       - AI_EMBEDDINGS_LOCAL_URL=http://embeddings:8080/v1/embeddings
       - AI_TRANSLATION_PROVIDER=local
       - AI_TRANSLATION_LOCAL_URL=http://translator:8000/v1/translations
-      - REDIS_URL=${REDIS_URL}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
       - INTERNAL_AI_API_KEY=secreto_interno
     depends_on:
       - embeddings
       - translator
+      - redis
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
 
 
   embeddings:
@@ -62,3 +69,9 @@ services:
 volumes:
   embedding-models:
   translation-models:
+  redis-data:
+
+networks:
+  default:
+    name: ${EXTERNAL_NETWORK:-chambapro_ai_default}
+    external: ${USE_EXTERNAL_NETWORK:-false}
