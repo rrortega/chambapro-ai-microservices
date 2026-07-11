@@ -79,8 +79,22 @@ async def translate(req: TranslationRequest):
         mapping.append(len(lines))
         flat_inputs.extend(lines)
 
-    # For M2M100, we need to set the tokenizer src_lang
-    tokenizer.src_lang = req.source_language
+    is_nllb = "nllb" in MODEL_NAME.lower()
+    def resolve_lang(code: str) -> str:
+        if is_nllb and len(code) == 2:
+            mapping = {
+                "en": "eng_Latn", "es": "spa_Latn", "fr": "fra_Latn", 
+                "de": "deu_Latn", "it": "ita_Latn", "pt": "por_Latn",
+                "zh": "zho_Hans", "ja": "jpn_Jpan", "ru": "rus_Cyrl", "ar": "arb_Arab"
+            }
+            return mapping.get(code, code)
+        return code
+
+    src_lang = resolve_lang(req.source_language)
+    tgt_lang = resolve_lang(req.target_language)
+
+    # For M2M100/NLLB, we set the tokenizer src_lang
+    tokenizer.src_lang = src_lang
     
     # Tokenize input
     source_tokens = []
@@ -91,7 +105,10 @@ async def translate(req: TranslationRequest):
             source_tokens.append(tokenizer.convert_ids_to_tokens(tokenizer.encode(text)))
     
     # Target prefix
-    target_prefix = [[tokenizer.lang_code_to_token[req.target_language]]] * len(flat_inputs)
+    if is_nllb:
+        target_prefix = [[tgt_lang]] * len(flat_inputs)
+    else:
+        target_prefix = [[tokenizer.lang_code_to_token[tgt_lang]]] * len(flat_inputs)
     
     try:
         # Translate

@@ -48,7 +48,7 @@ services:
     build:
       context: ./docker/ai/translator
     environment:
-      TRANSLATION_MODEL: facebook/m2m100_418M
+      TRANSLATION_MODEL: facebook/nllb-200-distilled-600M
       DEVICE: cpu
       COMPUTE_TYPE: int8
     volumes:
