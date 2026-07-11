@@ -72,25 +72,43 @@ sequenceDiagram
 
 ---
 
-## 📚 API Documentation
+## 📚 API Documentation & Interactive UI
 
-Interactive API documentation is powered by **Scalar**, providing a modern, dark/light mode interface with built-in testing capabilities.
+The gateway serves a **Custom Interactive UI** directly at the root (`/`) endpoint. It is built natively with Vanilla HTML/JS and TailwindCSS to provide a fast, framework-less, and responsive testing console (inspired by Stripe docs).
 
 Once the gateway is running, visit:
-👉 **[http://localhost:3000/docs](http://localhost:3000/docs)**
+👉 **[http://localhost:3000/](http://localhost:3000/)**
+
+### Features of the Interactive UI:
+- **Responsive Layout:** Adjusts from side-by-side on desktop to a stacked layout on mobile.
+- **Dark/Light Mode:** Toggleable theme that remembers your preference.
+- **Language Toggle:** Instantly swap the UI language between English and Spanish.
+- **Live API Console:** A real-time right-hand console showing exactly what JSON will be sent, and displaying the raw JSON response from the server.
+- **Cache Management:** Includes a `Clear Cache` button to manually purge the Redis translation cache during testing.
 
 ---
 
-## 🔒 Security
+## 🔒 Security & Endpoints
 
 All business logic endpoints are protected by an API Key. 
 You must include the `x-api-key` header in all requests to `/v1/*`.
 
+### POST `/v1/translations`
+Translates text from a source language to a target language.
+- Includes advanced chunking to prevent repetition loops (e.g. M2M100 "WORK WORK WORK" bug).
+- Normalizes literal newline characters to protect against raw text pastes.
+
+### POST `/v1/embeddings`
+Generates vector embeddings using HuggingFace TEI (Text Embeddings Inference).
+
+### DELETE `/v1/cache/translations`
+Clears the Redis cache for translations. 
+- You can clear a specific translation by passing `?hash={hash}`.
+- Without a hash, it purges all cached translations.
+
 ```bash
-curl -X POST http://localhost:3000/v1/embeddings \
-  -H "x-api-key: your_global_key_here" \
-  -H "Content-Type: application/json" \
-  -d '{"input": "Hello world"}'
+curl -X DELETE http://localhost:3000/v1/cache/translations \
+  -H "x-api-key: your_global_key_here"
 ```
 
 Configure this key by setting the `GLOBAL_API_KEY` variable in your `.env` file.
@@ -113,29 +131,33 @@ To enable telemetry:
 
 The platform is designed to be deployed entirely via Docker Compose. Below are guides for the most common deployment strategies.
 
-### 1. Direct Docker (VPS / EC2 / Droplet)
+### 1. Easypanel (Recommended)
+
+[Easypanel](https://easypanel.io/) is a modern control panel for managing Docker apps. Since this repository contains multiple inter-dependent services (Gateway, TEI, Python Translator, Redis), you must use Easypanel's Docker Compose deployment type.
+
+**Step-by-step for Easypanel:**
+1. In your Easypanel dashboard, navigate to your Project.
+2. Click **Create Service** and select **App**.
+3. Under the **Source** tab, select **Github** and connect this repository.
+4. Under the **Build** tab, **CRITICAL:** Change the Build Method to **Docker Compose**.
+5. Easypanel will look for a `docker-compose.yml` in the root (ensure you create/rename your production compose file to `docker-compose.yml`).
+6. Go to the **Environment** tab and populate your variables (e.g. `GLOBAL_API_KEY`, `OPENAI_API_KEY`, etc).
+7. Go to the **Domains** tab and map your public domain (e.g., `ai.chambapro.com`).
+   - Note: Map the domain specifically to the **gateway** service on port **3000**.
+   - Do **NOT** expose the `embeddings`, `translator`, or `redis` services to the internet. They must remain internal.
+8. Click **Deploy**. Easypanel will automatically provision SSL certificates and orchestrate the cluster.
+
+### 2. Direct Docker (VPS / EC2 / Droplet)
 
 If you are managing your own server with Docker installed:
 
 1. Clone the repository onto your server.
 2. Create and populate your production `.env` file based on `.env.example`.
-3. Start the production cluster (using the production compose file):
+3. Start the production cluster:
    ```bash
-   docker-compose up --build -d
+   docker-compose -f docker-compose.yml up --build -d
    ```
 4. Set up a reverse proxy (like Nginx or Traefik) to map a domain to port `3000` and handle SSL termination.
-
-### 2. Easypanel
-
-[Easypanel](https://easypanel.io/) is a modern control panel for managing Docker apps.
-
-1. In your Easypanel dashboard, go to your Project.
-2. Click **Create Service** and choose **App** (or "Docker Compose" if you prefer to paste the compose file directly).
-3. We recommend using the **Docker Compose** option:
-   - Paste the contents of `docker-compose.yml` into the editor.
-   - Define your environment variables in the **Environment** tab.
-   - In the **Domains** tab, map your public domain to the `gateway` service on port `3000`.
-4. Click **Deploy**. Easypanel will automatically provision SSL certificates.
 
 ### 3. Coolify
 
@@ -143,13 +165,12 @@ If you are managing your own server with Docker installed:
 
 1. In your Coolify dashboard, create a new **Project** and **Environment**.
 2. Add a new **Resource** -> **Docker Compose**.
-3. Connect your Git repository or paste the contents of `docker-compose.yml`.
+3. Connect your Git repository.
 4. Coolify will parse the compose file and detect the `gateway`, `translator`, `embeddings`, and `redis` services.
 5. In the configuration for the **gateway** service:
    - Add your environment variables.
    - Configure the domains/URL you want to expose. Coolify handles Traefik/Caddy routing automatically.
-6. Make sure to **not** expose the ports of `translator`, `embeddings`, or `redis` to the public internet. They should only communicate internally within the Docker network.
-7. Click **Deploy**.
+6. Click **Deploy**.
 
 ---
 
