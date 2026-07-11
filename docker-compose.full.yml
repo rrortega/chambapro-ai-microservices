@@ -38,7 +38,7 @@ services:
       - --served-model-name
       - multilingual-e5-small
     volumes:
-      - embedding-models:/data
+      - ${EMBEDDINGS_HOST_DIR:-embedding-models}:/data
     environment:
       HF_HOME: /data
     restart: unless-stopped
@@ -60,7 +60,7 @@ services:
       DEVICE: cpu
       COMPUTE_TYPE: int8
     volumes:
-      - translation-models:/models
+      - ${TRANSLATOR_HOST_DIR:-translation-models}:/models
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://127.0.0.1:8000/health || exit 1"]

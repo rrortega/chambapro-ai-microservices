@@ -9,9 +9,10 @@ services:
       - AI_TRANSLATION_LOCAL_URL=${AI_TRANSLATION_LOCAL_URL:-http://translator:8000/v1/translations}
       - REDIS_URL=${REDIS_URL}
       - INTERNAL_AI_API_KEY=${INTERNAL_AI_API_KEY:-secreto_interno}
+      - PORT=80
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:80/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5

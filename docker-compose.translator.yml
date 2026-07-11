@@ -6,11 +6,12 @@ services:
       TRANSLATION_MODEL: facebook/nllb-200-distilled-600M
       DEVICE: cpu
       COMPUTE_TYPE: int8
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
     volumes:
-      - translation-models:/models
+      - ${TRANSLATOR_HOST_DIR:-translation-models}:/models
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8000/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:80/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5

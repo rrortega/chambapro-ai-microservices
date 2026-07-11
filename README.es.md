@@ -147,7 +147,18 @@ A continuación se presentan las guías para las estrategias de despliegue más 
 Si despliegas este microservicio en un stack separado y necesitas que hable con tu Redis o base de datos principal, puedes configurar la red usando variables de entorno en cualquiera de los archivos compose:
 
 - `USE_EXTERNAL_NETWORK=true`
-- `EXTERNAL_NETWORK=nombre_de_tu_red_externa` (ej. `chambapro`)### 1. Easypanel (Recomendado)
+- `EXTERNAL_NETWORK=nombre_de_tu_red_externa` (ej. `chambapro`)
+
+### 💾 Volumenes Persistentes en Host (Opcional)
+Para evitar descargar los modelos de HuggingFace cada vez que redespliegas, los archivos `docker-compose` utilizan volúmenes. Si deseas mapear esos modelos a una carpeta física de tu servidor (Host Bind Mount), puedes definir estas variables en Easypanel o en tu `.env`:
+
+- `EMBEDDINGS_HOST_DIR=/ruta/absoluta/en/tu/host/embeddings`
+- `TRANSLATOR_HOST_DIR=/ruta/absoluta/en/tu/host/translator`
+
+Si no las defines, se usarán los volúmenes de Docker gestionados automáticamente.
+
+### 🌐 Puertos de los servicios separados
+Los archivos `docker-compose.gateway.yml`, `docker-compose.embeddings.yml` y `docker-compose.translator.yml` están configurados para correr internamente en el **puerto 80**. Esto facilita que paneles como Easypanel o Traefik los enruten automáticamente a un dominio público sin configuraciones adicionales de puertos. El archivo `docker-compose.full.yml` mantiene los puertos separados para que no haya conflictos.### 1. Easypanel (Recomendado)
 
 [Easypanel](https://easypanel.io/) es un panel de control moderno para administrar apps de Docker. Como este repositorio contiene múltiples servicios interdependientes (Gateway, TEI, Traductor Python), debes usar el tipo de despliegue Docker Compose de Easypanel.
 

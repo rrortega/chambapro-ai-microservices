@@ -6,16 +6,16 @@ services:
       - --model-id
       - intfloat/multilingual-e5-small
       - --port
-      - "8080"
+      - "80"
       - --served-model-name
       - multilingual-e5-small
     volumes:
-      - embedding-models:/data
+      - ${EMBEDDINGS_HOST_DIR:-embedding-models}:/data
     environment:
       HF_HOME: /data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:80/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
