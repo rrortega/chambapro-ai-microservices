@@ -28,38 +28,24 @@ export const swaggerPlugin = fp(async (fastify: FastifyInstance) => {
     return fastify.swagger();
   });
 
-  // Serve the custom RapiDoc UI
+  // Serve the custom Redoc UI (Stripe style)
   fastify.get('/docs', async (request, reply) => {
     reply.type('text/html');
-    return `<!doctype html>
+    return `<!DOCTYPE html>
 <html>
-<head>
-  <title>ChambaPro AI API</title>
-  <meta charset="utf-8">
-  <script type="module" src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"></script>
-  <style>
-    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-  </style>
-</head>
-<body>
-  <rapi-doc 
-    spec-url="/docs/json"
-    theme="dark"
-    render-style="read"
-    show-header="true"
-    allow-try="true"
-    allow-authentication="true"
-    primary-color="#3b82f6"
-    nav-bg-color="#0f172a"
-    bg-color="#020617"
-    text-color="#f8fafc"
-    header-color="#0f172a"
-  >
-    <div slot="nav-logo" style="display: flex; align-items: center; justify-content: center; padding: 1rem 0;">
-      <h2 style="color: #fff; margin: 0;">ChambaPro AI</h2>
-    </div>
-  </rapi-doc>
-</body>
+  <head>
+    <title>ChambaPro AI API</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+    <style>
+      body { margin: 0; padding: 0; }
+    </style>
+  </head>
+  <body>
+    <redoc spec-url='/docs/json' theme='{ "colors": { "primary": { "main": "#3b82f6" } } }'></redoc>
+    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
+  </body>
 </html>`;
   });
 });
