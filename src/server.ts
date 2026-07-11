@@ -35,6 +35,21 @@ fastify.get('/health', async () => {
   return { status: 'ok' };
 });
 
+fastify.get('/', async (_, reply) => {
+  reply.type('text/html').send(`
+    <html>
+      <body style="font-family: sans-serif; padding: 2rem; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+        <h2>🚀 ChambaPro AI Gateway</h2>
+        <p>This microservice is running correctly.</p>
+        <ul>
+          <li><strong>Healthcheck:</strong> <a href="/health">/health</a></li>
+          <li><strong>Swagger Docs:</strong> <a href="/docs">/docs</a></li>
+        </ul>
+      </body>
+    </html>
+  `);
+});
+
 const start = async () => {
   try {
     await fastify.listen({ port: 3000, host: '0.0.0.0' });

@@ -2,6 +2,7 @@ import os
 import ctranslate2
 import transformers
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -57,6 +58,21 @@ async def startup_event():
 @app.get("/health")
 def health():
     return {"status": "ok", "model_loaded": translator is not None}
+
+@app.get("/", response_class=HTMLResponse)
+def root():
+    return """
+    <html>
+      <body style="font-family: sans-serif; padding: 2rem; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+        <h2>🌍 AI Translator Service</h2>
+        <p>This microservice is running correctly.</p>
+        <ul>
+          <li><strong>Healthcheck:</strong> <a href="/health">/health</a></li>
+          <li><strong>Swagger Docs:</strong> <a href="/docs">/docs</a></li>
+        </ul>
+      </body>
+    </html>
+    """
 
 @app.post("/v1/translations", response_model=TranslationResponse)
 async def translate(req: TranslationRequest):

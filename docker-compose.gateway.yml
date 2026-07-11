@@ -10,6 +10,11 @@ services:
       - REDIS_URL=${REDIS_URL}
       - INTERNAL_AI_API_KEY=${INTERNAL_AI_API_KEY:-secreto_interno}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     deploy:
       resources:
         limits:
