@@ -83,6 +83,9 @@ export async function translateText(text: string, sourceLanguage: string, target
 }
 
 async function fetchExternalTranslation(text: string, src: string, target: string): Promise<{text: string, model: string}> {
+  if (!AI_CONFIG.translation.externalApiKey) {
+    throw new Error("Local model is not ready or failed, and OpenAI fallback is not configured (missing API key). Please wait for the local model to finish downloading or set OPENAI_API_KEY.");
+  }
   const client = new OpenAI({
     baseURL: AI_CONFIG.translation.externalUrl.replace('/v1/chat/completions', '/v1'),
     apiKey: AI_CONFIG.translation.externalApiKey,

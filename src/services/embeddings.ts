@@ -34,6 +34,9 @@ export async function getEmbeddings(text: string, options: any = {}): Promise<nu
 }
 
 async function fetchExternalEmbeddings(text: string, options: any = {}): Promise<number[]> {
+  if (!AI_CONFIG.embeddings.externalApiKey) {
+    throw new Error("Local model is not ready or failed, and OpenAI fallback is not configured (missing API key). Please wait for the local model to finish downloading or set OPENAI_API_KEY.");
+  }
   const client = new OpenAI({
     baseURL: AI_CONFIG.embeddings.externalUrl.replace('/v1/embeddings', '/v1'),
     apiKey: AI_CONFIG.embeddings.externalApiKey,
