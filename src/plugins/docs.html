@@ -321,9 +321,8 @@
         let reqBody = {};
         if (tabId === 'translations') {
           const rawInput = document.getElementById('t-input').value;
-          const inputs = rawInput.split('\n').filter(s => s.trim());
           reqBody = {
-            input: inputs,
+            input: [rawInput],
             source_language: document.getElementById('t-source').value || 'en',
             target_language: document.getElementById('t-target').value || 'es',
             beam_size: parseInt(document.getElementById('t-beam').value) || 1,
@@ -331,10 +330,9 @@
           };
         } else {
           const rawInput = document.getElementById('e-input').value;
-          const inputs = rawInput.split('\n').filter(s => s.trim());
           reqBody = {
             model: 'multilingual-e5-small',
-            input: inputs,
+            input: [rawInput],
             encoding_format: document.getElementById('e-encoding').value,
             truncate: document.getElementById('e-truncate').checked
           };
@@ -393,9 +391,9 @@
     window.executeTranslations = function(e) {
       e.preventDefault();
       const apiKey = document.getElementById('t-apikey').value;
-      const inputs = document.getElementById('t-input').value.split('\n').filter(s => s.trim());
+      const rawInput = document.getElementById('t-input').value;
       const body = {
-        input: inputs,
+        input: [rawInput],
         source_language: document.getElementById('t-source').value,
         target_language: document.getElementById('t-target').value,
         beam_size: parseInt(document.getElementById('t-beam').value) || 1,
@@ -407,9 +405,9 @@
     window.executeEmbeddings = function(e) {
       e.preventDefault();
       const apiKey = document.getElementById('e-apikey').value;
-      const inputs = document.getElementById('e-input').value.split('\n').filter(s => s.trim());
+      const rawInput = document.getElementById('e-input').value;
       const body = {
-        input: inputs,
+        input: [rawInput],
         encoding_format: document.getElementById('e-encoding').value,
         truncate: document.getElementById('e-truncate').checked
       };
