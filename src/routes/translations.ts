@@ -13,8 +13,10 @@ export async function translationRoutes(fastify: FastifyInstance) {
         required: ['input', 'source_language', 'target_language'],
         properties: {
           input: { type: ['string', 'array'], items: { type: 'string' } },
+          text: { type: 'string' },
           source_language: { type: 'string', example: 'en' },
           target_language: { type: 'string', example: 'es' },
+          target: { type: 'string', example: 'es' },
           beam_size: { type: 'number', default: 1, description: 'Beam size for generation' },
           max_batch_size: { type: 'number', default: 1024, description: 'Max batch size' },
           num_hypotheses: { type: 'number', default: 1, description: 'Number of hypotheses' },
@@ -25,12 +27,16 @@ export async function translationRoutes(fastify: FastifyInstance) {
   }, async (request, reply) => {
     const body = request.body as any;
     
-    if (!body || !body.input || !body.source_language || !body.target_language) {
-      return reply.code(400).send({ error: 'Missing required fields (input, source_language, target_language)' });
+    const input = body.input || body.text;
+    const targetLanguage = body.target_language || body.target;
+    const sourceLanguage = body.source_language || 'en';
+
+    if (!input || !targetLanguage) {
+      return reply.code(400).send({ error: 'Missing required fields (input/text, target_language/target)' });
     }
 
     try {
-      const inputs = Array.isArray(body.input) ? body.input : [body.input];
+      const inputs = Array.isArray(input) ? input : [input];
       const data = [];
       let totalChars = 0;
       let promptTokens = 0;
@@ -42,7 +48,7 @@ export async function translationRoutes(fastify: FastifyInstance) {
         totalChars += textToTranslate.length;
         promptTokens += Math.ceil(textToTranslate.length / 4);
         
-        const result = await translateText(textToTranslate, body.source_language, body.target_language, {
+        const result = await translateText(textToTranslate, sourceLanguage, targetLanguage, {
           beam_size: body.beam_size,
           max_batch_size: body.max_batch_size,
           num_hypotheses: body.num_hypotheses,
@@ -64,6 +70,8 @@ export async function translationRoutes(fastify: FastifyInstance) {
       return reply.send({
         object: 'translation.list',
         model: usedModel,
+        translation: data[0]?.text || '',
+        translatedText: data[0]?.text || '',
         data,
         usage: {
           prompt_tokens: promptTokens,

@@ -32,9 +32,11 @@ def load_model():
 
 class TranslationRequest(BaseModel):
     model: Optional[str] = None
-    input: List[str]
-    source_language: str
-    target_language: str
+    input: Optional[List[str]] = None
+    text: Optional[str] = None
+    source_language: Optional[str] = "en"
+    target_language: Optional[str] = None
+    target: Optional[str] = None
     beam_size: int = 1
     max_batch_size: int = 1024
     num_hypotheses: int = 1
@@ -44,10 +46,18 @@ class TranslationResult(BaseModel):
     index: int
     text: str
 
+class Usage(BaseModel):
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+
 class TranslationResponse(BaseModel):
     object: str = "translation.list"
     data: List[TranslationResult]
     model: str
+    translation: str
+    translatedText: str
+    usage: Usage
 
 @app.on_event("startup")
 async def startup_event():
@@ -81,14 +91,18 @@ async def translate(req: TranslationRequest):
     if translator is None or tokenizer is None:
         load_model()
 
-    if not req.input:
-        return TranslationResponse(data=[], model=MODEL_NAME)
+    inputs = req.input if req.input else ([req.text] if req.text else [])
+    tgt_lang = req.target_language or req.target
+    src_lang = req.source_language or "en"
+
+    if not inputs or not tgt_lang:
+        raise HTTPException(status_code=400, detail="Missing required fields: input/text and target_language/target")
 
     # M2M100 handles newlines poorly and often falls into repetition loops.
     # We split by newline, translate line by line, and reconstruct.
     flat_inputs = []
     mapping = []
-    for text in req.input:
+    for text in inputs:
         # Normalize literal "\n" strings (e.g. from UI paste) to actual newlines
         text = text.replace('\\n', '\n')
         lines = text.split('\n')
@@ -106,8 +120,8 @@ async def translate(req: TranslationRequest):
             return mapping.get(code, code)
         return code
 
-    src_lang = resolve_lang(req.source_language)
-    tgt_lang = resolve_lang(req.target_language)
+    src_lang = resolve_lang(src_lang)
+    tgt_lang = resolve_lang(tgt_lang)
 
     # For M2M100/NLLB, we set the tokenizer src_lang
     tokenizer.src_lang = src_lang
@@ -153,12 +167,33 @@ async def translate(req: TranslationRequest):
         # Reconstruct original structure
         output = []
         idx = 0
+        prompt_chars = 0
+        comp_chars = 0
+        
         for i, count in enumerate(mapping):
             chunk = decoded_flat[idx:idx+count]
-            output.append(TranslationResult(index=i, text='\n'.join(chunk)))
+            result_text = '\n'.join(chunk)
+            output.append(TranslationResult(index=i, text=result_text))
             idx += count
             
-        return TranslationResponse(data=output, model=MODEL_NAME)
+            prompt_chars += len(inputs[i]) if inputs[i] else 0
+            comp_chars += len(result_text)
+            
+        first_text = output[0].text if output else ""
+        prompt_tokens = prompt_chars // 4
+        comp_tokens = comp_chars // 4
+        
+        return TranslationResponse(
+            data=output, 
+            model=MODEL_NAME, 
+            translation=first_text, 
+            translatedText=first_text,
+            usage=Usage(
+                prompt_tokens=prompt_tokens,
+                completion_tokens=comp_tokens,
+                total_tokens=prompt_tokens + comp_tokens
+            )
+        )
     except Exception as e:
         print(f"Translation error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

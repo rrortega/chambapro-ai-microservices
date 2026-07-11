@@ -51,7 +51,7 @@ export async function translateText(text: string, sourceLanguage: string, target
       }
 
       const data = await response.json() as any;
-      result = data.data?.[0]?.text || '';
+      result = data.translation || data.translatedText || data.data?.[0]?.text || '';
       usedModel = data.model || 'local-translator';
     } catch (err) {
       console.warn('[AI Gateway] Local translation failed, trying external fallback...', err);
