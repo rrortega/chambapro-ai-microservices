@@ -33,16 +33,23 @@ export async function translationRoutes(fastify: FastifyInstance) {
       const inputs = Array.isArray(body.input) ? body.input : [body.input];
       const data = [];
       let totalChars = 0;
+      let promptTokens = 0;
+      let completionTokens = 0;
       
       for (let i = 0; i < inputs.length; i++) {
         const textToTranslate = inputs[i];
         totalChars += textToTranslate.length;
+        promptTokens += Math.ceil(textToTranslate.length / 4);
+        
         const text = await translateText(textToTranslate, body.source_language, body.target_language, {
           beam_size: body.beam_size,
           max_batch_size: body.max_batch_size,
           num_hypotheses: body.num_hypotheses,
           repetition_penalty: body.repetition_penalty
         });
+        
+        completionTokens += Math.ceil(text.length / 4);
+        
         data.push({
           text,
           index: i,
@@ -53,7 +60,13 @@ export async function translationRoutes(fastify: FastifyInstance) {
       tokenCounter.add(totalChars);
 
       return reply.send({
+        object: 'translation.list',
         data,
+        usage: {
+          prompt_tokens: promptTokens,
+          completion_tokens: completionTokens,
+          total_tokens: promptTokens + completionTokens
+        }
       });
     } catch (error: any) {
       fastify.log.error(error);

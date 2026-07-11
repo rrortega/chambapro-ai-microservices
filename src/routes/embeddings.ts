@@ -31,10 +31,13 @@ export async function embeddingsRoutes(fastify: FastifyInstance) {
       const inputs = Array.isArray(body.input) ? body.input : [body.input];
       const data = [];
       let totalChars = 0;
+      let promptTokens = 0;
       
       for (let i = 0; i < inputs.length; i++) {
         const text = inputs[i];
         totalChars += text.length;
+        promptTokens += Math.ceil(text.length / 4);
+        
         const embedding = await getEmbeddings(text, {
           encoding_format: body.encoding_format,
           truncate: body.truncate,
@@ -47,7 +50,7 @@ export async function embeddingsRoutes(fastify: FastifyInstance) {
         });
       }
 
-      // Add to telemetry
+      // Add to telemetry (keep raw chars for telemetry if desired, or switch to tokens)
       tokenCounter.add(totalChars);
 
       return reply.send({
@@ -55,8 +58,8 @@ export async function embeddingsRoutes(fastify: FastifyInstance) {
         data,
         model: body.model || 'multilingual-e5-small',
         usage: {
-          prompt_tokens: totalChars,
-          total_tokens: totalChars,
+          prompt_tokens: promptTokens,
+          total_tokens: promptTokens,
         }
       });
     } catch (error: any) {
