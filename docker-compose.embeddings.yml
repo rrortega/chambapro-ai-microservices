@@ -1,0 +1,28 @@
+services:
+  embeddings:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-latest
+    platform: linux/amd64
+    command:
+      - --model-id
+      - intfloat/multilingual-e5-small
+      - --port
+      - "8080"
+      - --served-model-name
+      - multilingual-e5-small
+    volumes:
+      - embedding-models:/data
+    environment:
+      HF_HOME: /data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+volumes:
+  embedding-models:

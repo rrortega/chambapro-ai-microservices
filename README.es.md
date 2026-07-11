@@ -129,9 +129,18 @@ Para activar la telemetría:
 
 ## 🚢 Guía de Despliegue
 
-La plataforma está diseñada para ser desplegada por completo a través de Docker Compose. A continuación se presentan las guías para las estrategias de despliegue más comunes.
+La plataforma está diseñada para ser desplegada a través de Docker Compose. Puedes desplegar todo junto (monolito) o escalar cada servicio por separado.
 
-### 1. Easypanel (Recomendado)
+### 🏗 Opciones de Despliegue (Archivos Compose)
+
+Hemos dividido la infraestructura en varios archivos `docker-compose` para permitir escalar los servicios de forma independiente:
+
+- **`docker-compose.yml` (Todo en uno)**: Despliega el Gateway, Embeddings y Translator juntos. Ideal para entornos pequeños o iniciales.
+- **`docker-compose.gateway.yml`**: Despliega SOLO el servicio Gateway. Escálalo si tienes muchas peticiones concurrentes pero poco uso de IA.
+- **`docker-compose.embeddings.yml`**: Despliega SOLO el motor de embeddings. Escálalo para procesos masivos de vectorización.
+- **`docker-compose.translator.yml`**: Despliega SOLO el motor de traducción. Escálalo si procesas muchos idiomas simultáneamente.
+
+A continuación se presentan las guías para las estrategias de despliegue más comunes.### 1. Easypanel (Recomendado)
 
 [Easypanel](https://easypanel.io/) es un panel de control moderno para administrar apps de Docker. Como este repositorio contiene múltiples servicios interdependientes (Gateway, TEI, Traductor Python), debes usar el tipo de despliegue Docker Compose de Easypanel.
 

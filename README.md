@@ -129,9 +129,18 @@ To enable telemetry:
 
 ## 🚢 Deployment Guide
 
-The platform is designed to be deployed entirely via Docker Compose. Below are guides for the most common deployment strategies.
+The platform is designed to be deployed via Docker Compose. You can deploy everything together (monolithic) or scale each service independently.
 
-### 1. Easypanel (Recommended)
+### 🏗 Deployment Options (Compose Files)
+
+We have split the infrastructure into multiple `docker-compose` files to allow independent scaling of services:
+
+- **`docker-compose.yml` (All-in-one)**: Deploys Gateway, Embeddings, and Translator together. Ideal for small or initial environments.
+- **`docker-compose.gateway.yml`**: Deploys ONLY the Gateway service. Scale this if you have many concurrent requests but low AI usage.
+- **`docker-compose.embeddings.yml`**: Deploys ONLY the embeddings engine. Scale this for massive vectorization tasks.
+- **`docker-compose.translator.yml`**: Deploys ONLY the translation engine. Scale this if you process many languages simultaneously.
+
+Below are guides for the most common deployment strategies.### 1. Easypanel (Recommended)
 
 [Easypanel](https://easypanel.io/) is a modern control panel for managing Docker apps. Since this repository contains multiple inter-dependent services (Gateway, TEI, Python Translator), you must use Easypanel's Docker Compose deployment type.
 

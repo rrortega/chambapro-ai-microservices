@@ -1,0 +1,16 @@
+services:
+  gateway:
+    build:
+      context: .
+    environment:
+      - AI_EMBEDDINGS_PROVIDER=${AI_EMBEDDINGS_PROVIDER:-local}
+      - AI_EMBEDDINGS_LOCAL_URL=${AI_EMBEDDINGS_LOCAL_URL:-http://embeddings:8080/v1/embeddings}
+      - AI_TRANSLATION_PROVIDER=${AI_TRANSLATION_PROVIDER:-local}
+      - AI_TRANSLATION_LOCAL_URL=${AI_TRANSLATION_LOCAL_URL:-http://translator:8000/v1/translations}
+      - REDIS_URL=${REDIS_URL}
+      - INTERNAL_AI_API_KEY=${INTERNAL_AI_API_KEY:-secreto_interno}
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
