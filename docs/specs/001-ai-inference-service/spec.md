@@ -1,5 +1,7 @@
 # 008 AI Inference Service & Gateway
 
+**Status:** ✅ Completed / Archived
+
 ## 1. Contexto y Problema
 La plataforma requiere capacidades de Inteligencia Artificial para dos tareas críticas:
 1. **Embeddings:** Vectorización de texto a alta velocidad (baja latencia, alto volumen).
