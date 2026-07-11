@@ -76,8 +76,6 @@ export async function translationRoutes(fastify: FastifyInstance) {
         model: usedModel,
         source_language: data[0]?.source_language || sourceLanguage,
         target_language: data[0]?.target_language || targetLanguage,
-        translation: data[0]?.text || '',
-        translatedText: data[0]?.text || '',
         data,
         usage: {
           prompt_tokens: promptTokens,

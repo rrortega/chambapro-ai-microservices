@@ -56,8 +56,8 @@ class TranslationResponse(BaseModel):
     object: str = "translation.list"
     data: List[TranslationResult]
     model: str
-    translation: str
-    translatedText: str
+    source_language: str
+    target_language: str
     usage: Usage
 
 @app.on_event("startup")
@@ -199,8 +199,8 @@ async def translate(req: TranslationRequest):
         return TranslationResponse(
             data=output, 
             model=MODEL_NAME, 
-            translation=first_text, 
-            translatedText=first_text,
+            source_language=src_lang,
+            target_language=tgt_lang,
             usage=Usage(
                 prompt_tokens=prompt_tokens,
                 completion_tokens=comp_tokens,

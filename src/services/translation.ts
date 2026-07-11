@@ -55,7 +55,7 @@ export async function translateText(text: string, sourceLanguage: string, target
       }
 
       const data = await response.json() as any;
-      result = data.translation || data.translatedText || data.data?.[0]?.text || '';
+      result = data.data?.[0]?.text || '';
       usedModel = data.model || 'local-translator';
       detectedSrc = data.source_language || detectedSrc;
       detectedTgt = data.target_language || detectedTgt;
