@@ -3,3 +3,6 @@ uvicorn==0.27.1
 ctranslate2==4.1.0
 transformers==4.38.2
 pydantic==2.6.4
+sentencepiece
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch

@@ -4,6 +4,7 @@ dist/
 .env.*
 !.env.example
 .DS_Store
+docker-compose.dev.yml
 *.log
 data/
 translation-models/

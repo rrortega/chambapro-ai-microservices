@@ -27,6 +27,7 @@ services:
 
   embeddings:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-latest
+    platform: linux/amd64
     command:
       - --model-id
       - intfloat/multilingual-e5-small
@@ -71,7 +72,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 2G
+          memory: 4G
 
 volumes:
   embedding-models:

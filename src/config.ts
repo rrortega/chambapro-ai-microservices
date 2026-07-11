@@ -14,5 +14,11 @@ export const AI_CONFIG = {
     cacheTtl: parseInt(process.env.AI_TRANSLATION_CACHE_TTL || '86400', 10),
   },
   internalApiKey: process.env.INTERNAL_AI_API_KEY || 'secreto_interno',
+  globalApiKey: process.env.GLOBAL_API_KEY || 'chambapro_global_key',
+  telemetry: {
+    enabled: process.env.ENABLE_TELEMETRY === 'true',
+    exporterEndpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318/v1/metrics',
+    serviceName: process.env.OTEL_SERVICE_NAME || 'chambapro-ai-gateway',
+  },
   redisUrl: process.env.REDIS_URL || 'redis://localhost:6379'
 };
