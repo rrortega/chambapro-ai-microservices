@@ -17,8 +17,6 @@ services:
       - "64"
       - --max-batch-tokens
       - "2048"
-    ports:
-      - "3000:80"
     volumes:
       - ${EMBEDDINGS_HOST_DIR:-embedding-models}:/data
     environment:
