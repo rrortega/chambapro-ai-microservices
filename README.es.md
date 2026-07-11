@@ -137,15 +137,12 @@ La plataforma está diseñada para ser desplegada por completo a través de Dock
 
 **Paso a paso para Easypanel:**
 1. En tu panel de Easypanel, navega a tu Proyecto.
-2. Haz clic en **Create Service** y selecciona **App**.
-3. Bajo la pestaña **Source**, selecciona **Github** y conecta este repositorio.
-4. Bajo la pestaña **Build**, **CRÍTICO:** Cambia el Build Method a **Docker Compose**.
-5. Easypanel buscará un `docker-compose.yml` en la raíz (asegúrate de crear/renombrar tu archivo compose de producción a `docker-compose.yml`).
-6. Ve a la pestaña **Environment** y llena tus variables (ej. `GLOBAL_API_KEY`, `OPENAI_API_KEY`, etc).
-7. Ve a la pestaña **Domains** y enlaza tu dominio público (ej., `ai.chambapro.com`).
-   - Nota: Enlaza el dominio específicamente al servicio **gateway** en el puerto **3000**.
+2. Haz clic en **Create Service** y selecciona la opción **Docker Compose** (NO selecciones "App").
+3. Conecta tu repositorio de Github o pega el contenido de `docker-compose.yml` directamente en el editor de Compose de Easypanel.
+4. Ve a la pestaña **Environment** y llena tus variables (ej. `GLOBAL_API_KEY`, `OPENAI_API_KEY`, etc).
+5. Ve a la pestaña **Domains** y enlaza tu dominio público (ej., `ai.chambapro.com`) al servicio **gateway** en el puerto **3000**.
    - **NO** expongas los servicios `embeddings`, `translator`, ni `redis` al internet. Deben permanecer internos.
-8. Haz clic en **Deploy**. Easypanel proveerá automáticamente certificados SSL y orquestará el clúster.
+6. Haz clic en **Deploy**. Easypanel proveerá automáticamente certificados SSL y orquestará todo el clúster.
 
 ### 2. Docker Directo (VPS / EC2 / Droplet)
 
