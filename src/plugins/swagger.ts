@@ -28,23 +28,30 @@ export const swaggerPlugin = fp(async (fastify: FastifyInstance) => {
     return fastify.swagger();
   });
 
-  // Serve the custom Redoc UI (Stripe style)
+  // Serve Stoplight Elements UI (Modern Stripe style with Try-It out)
   fastify.get('/docs', async (request, reply) => {
     reply.type('text/html');
     return `<!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>ChambaPro AI API</title>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+    <!-- Stoplight Elements -->
+    <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">
     <style>
-      body { margin: 0; padding: 0; }
+      body { margin: 0; padding: 0; height: 100vh; }
     </style>
   </head>
   <body>
-    <redoc spec-url='/docs/json' theme='{ "colors": { "primary": { "main": "#3b82f6" } } }'></redoc>
-    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
+    <elements-api
+      apiDescriptionUrl="/docs/json"
+      router="hash"
+      layout="sidebar"
+      hideTryIt="false"
+      logo="https://chambapro.com/favicon.ico"
+    ></elements-api>
   </body>
 </html>`;
   });
