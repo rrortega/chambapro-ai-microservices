@@ -13,7 +13,10 @@ export async function embeddingsRoutes(fastify: FastifyInstance) {
         required: ['input'],
         properties: {
           input: { type: ['string', 'array'], items: { type: 'string' } },
-          model: { type: 'string' }
+          model: { type: 'string' },
+          encoding_format: { type: 'string', enum: ['float', 'base64'], default: 'float' },
+          truncate: { type: 'boolean', description: 'Truncate inputs longer than max length (TEI)' },
+          dimensions: { type: 'number', description: 'Number of dimensions' }
         }
       }
     }
@@ -32,7 +35,11 @@ export async function embeddingsRoutes(fastify: FastifyInstance) {
       for (let i = 0; i < inputs.length; i++) {
         const text = inputs[i];
         totalChars += text.length;
-        const embedding = await getEmbeddings(text);
+        const embedding = await getEmbeddings(text, {
+          encoding_format: body.encoding_format,
+          truncate: body.truncate,
+          dimensions: body.dimensions
+        });
         data.push({
           object: 'embedding',
           embedding,

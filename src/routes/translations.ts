@@ -14,7 +14,11 @@ export async function translationRoutes(fastify: FastifyInstance) {
         properties: {
           input: { type: ['string', 'array'], items: { type: 'string' } },
           source_language: { type: 'string', example: 'en' },
-          target_language: { type: 'string', example: 'es' }
+          target_language: { type: 'string', example: 'es' },
+          beam_size: { type: 'number', default: 1, description: 'Beam size for generation' },
+          max_batch_size: { type: 'number', default: 1024, description: 'Max batch size' },
+          num_hypotheses: { type: 'number', default: 1, description: 'Number of hypotheses' },
+          repetition_penalty: { type: 'number', default: 1.0, description: 'Repetition penalty' }
         }
       }
     }
@@ -33,7 +37,12 @@ export async function translationRoutes(fastify: FastifyInstance) {
       for (let i = 0; i < inputs.length; i++) {
         const textToTranslate = inputs[i];
         totalChars += textToTranslate.length;
-        const text = await translateText(textToTranslate, body.source_language, body.target_language);
+        const text = await translateText(textToTranslate, body.source_language, body.target_language, {
+          beam_size: body.beam_size,
+          max_batch_size: body.max_batch_size,
+          num_hypotheses: body.num_hypotheses,
+          repetition_penalty: body.repetition_penalty
+        });
         data.push({
           text,
           index: i,

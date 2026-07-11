@@ -34,6 +34,10 @@ class TranslationRequest(BaseModel):
     input: List[str]
     source_language: str
     target_language: str
+    beam_size: int = 1
+    max_batch_size: int = 1024
+    num_hypotheses: int = 1
+    repetition_penalty: float = 1.0
 
 class TranslationResult(BaseModel):
     index: int
@@ -78,7 +82,11 @@ async def translate(req: TranslationRequest):
         results = translator.translate_batch(
             source_tokens,
             target_prefix=target_prefix,
-            replace_unknowns=True
+            replace_unknowns=True,
+            beam_size=req.beam_size,
+            max_batch_size=req.max_batch_size,
+            num_hypotheses=req.num_hypotheses,
+            repetition_penalty=req.repetition_penalty
         )
         
         # Decode

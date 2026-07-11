@@ -12,6 +12,7 @@ import { swaggerPlugin } from './plugins/swagger';
 
 const fastify = Fastify({
   logger: true,
+  ignoreTrailingSlash: true,
   ajv: {
     customOptions: {
       strict: false,

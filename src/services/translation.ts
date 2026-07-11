@@ -8,11 +8,12 @@ function getTranslationHash(text: string, src: string, target: string): string {
   return crypto.createHash('sha256').update(`${src}:${target}:${text}`).digest('hex');
 }
 
-export async function translateText(text: string, sourceLanguage: string, targetLanguage: string): Promise<string> {
+export async function translateText(text: string, sourceLanguage: string, targetLanguage: string, options: any = {}): Promise<string> {
   const cleanText = (text || '').trim();
   if (!cleanText) return '';
 
-  const cacheKey = `translation:${sourceLanguage}:${targetLanguage}:${getTranslationHash(cleanText, sourceLanguage, targetLanguage)}`;
+  const optionsHash = crypto.createHash('md5').update(JSON.stringify(options)).digest('hex');
+  const cacheKey = `translation:${sourceLanguage}:${targetLanguage}:${optionsHash}:${getTranslationHash(cleanText, sourceLanguage, targetLanguage)}`;
 
   try {
     const cached = await redis.get(cacheKey);
@@ -35,6 +36,7 @@ export async function translateText(text: string, sourceLanguage: string, target
           input: [cleanText],
           source_language: sourceLanguage,
           target_language: targetLanguage,
+          ...options
         }),
       });
 
