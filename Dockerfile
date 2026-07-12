@@ -1,14 +1,24 @@
-FROM node:20-alpine
+# syntax=docker/dockerfile:1
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+COPY package*.json tsconfig.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci
+
+COPY src/ ./src
+RUN npx tsc
+
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+ENV NODE_ENV=production
+
 COPY package*.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
 
-COPY . .
+COPY --from=builder /app/dist ./dist
 
-# In a real production setup, we would build the TS files first
-# For simplicity in this microservice we can just run with tsx
 EXPOSE 3000
 
-CMD ["npx", "tsx", "src/server.ts"]
+CMD ["node", "dist/server.js"]
