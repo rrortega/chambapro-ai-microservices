@@ -72,6 +72,8 @@ services:
       TRANSLATION_MODEL: facebook/nllb-200-distilled-600M
       DEVICE: cpu
       COMPUTE_TYPE: int8
+      HF_HOME: /models/.cache
+      HUGGINGFACE_HUB_CACHE: /models/.cache
     volumes:
       - ${TRANSLATOR_HOST_DIR:-translation-models}:/models
     restart: unless-stopped
