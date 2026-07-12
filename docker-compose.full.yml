@@ -51,6 +51,7 @@ services:
       - ${EMBEDDINGS_HOST_DIR:-embedding-models}:/data
     environment:
       HF_HOME: /data
+      HUGGINGFACE_HUB_CACHE: /data
       OMP_NUM_THREADS: "2"
       RAYON_NUM_THREADS: "2"
     restart: unless-stopped

@@ -24,9 +24,8 @@ export async function getEmbeddings(text: string, options: any = {}): Promise<nu
       } as any);
       return response.data[0].embedding;
     } catch (err) {
-      console.warn('[AI Gateway] Local embeddings failed, trying external fallback...', err);
-      fallbackCounter.add(1);
-      return await fetchExternalEmbeddings(truncatedText, validOptions);
+      console.error('[AI Gateway] Local embeddings failed:', err);
+      throw err; // Fail and let the queue worker retry later
     }
   } else {
     return await fetchExternalEmbeddings(truncatedText, validOptions);
